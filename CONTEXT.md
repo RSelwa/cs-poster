@@ -4,7 +4,15 @@ Project notes that travel with the repo (multi-device). Read this first when res
 
 ## What this is
 
-Generative posters from CS2 match data, **one poster per series** (Bo3/Bo5). Each map = a band; band width ∝ round count (a stomp reads thin, an OT war sprawls — the unevenness is the data). Inspired by Zeh Fernandes' World Cup posters: <https://zehfernandes.com/posts/how-i-turned-world-cup-data-into-posters>. Standard: actually beautiful, not "works".
+Generative posters from CS2 match data, **one poster per series** (Bo3/Bo5). Inspired by Zeh Fernandes' World Cup posters: <https://zehfernandes.com/posts/how-i-turned-world-cup-data-into-posters>. Standard: actually beautiful, not "works". Reference images live in `refs/` (05-grid, 07-events, 07-lines, 08-gravity.mp4, 09-drama.mp4, 10-ned.jpg — the final is the dense orange/blue gradient on cream).
+
+### The model (decided with the user — matches his look)
+
+- **One continuous grid for the whole series. 1 cell = 1 round.** All rounds of all maps fill cells in reading order (left→right, top→bottom), chronological, **no break between maps**.
+- **Grid footprint is fixed** (`gridH`), cells subdivide to hold however many rounds: fixed `cols` (8), `rows = ceil(total/cols)`, cell height shrinks as rounds grow.
+- Each cell emits brush strokes in the **round-winner's color**, flowing **left (team A) / right (team B)**, long sweeps integrated through the gravity field so they curve. Many thin low-opacity strokes on a **cream ground** (#f4f0e7) → they blend into an airbrushed gradient; orange+blue overlap darkens (multiply).
+- **Gravity wells = "important" rounds** (his = shots). Ours: map-clinch round (always), aces/clutches if present, **mocked clutches** (seeded ~60% round of a map when it has no real clutch — flagged `clutch*`), pistols minor. Wells drawn faint (circle+crosshair+label) or hidden; lines orbit them.
+- **Very little text**: tiny map tags, faint well labels, a small boxed score block bottom-right (teams + series score + format/event/date). No big header.
 
 ## Tooling
 
@@ -45,7 +53,11 @@ p5.brush's field integration is `heading = field_angle − plotAngle` (`src/core
 ### Live parameter panel (Zeh's "interface to iterate")
 `index.html` has a left `#panel`; `sketch.js` `buildPanel()` makes sliders bound to `layout.js DEFAULTS` (`swirl, pull, ambient, baseLen, strokesPerRound, taper, slotW, bandH, step`) + render-only controls (`brush` select, `opacity`, `curvature`, `brushScale`, bg-texture toggle). Any change re-runs `computePoster` + repaints. This is how we converge on the look — tune live, then bake good values into DEFAULTS.
 
-Tunable knobs: `layout.js` `DEFAULTS` (exported) → `swirl`, `pull`, `baseLen`, `strokesPerRound`, `taper`, `slotW`, `ambient`, `step`, `bandH`, `bandGap`.
+Tunable knobs: `layout.js` `DEFAULTS` (exported) → `cols`, `strokesPerCell`, `baseLenFrac`, `lenVar`, `swirl`, `pull`, `ambient`, `taper`, `wellRadiusFrac`, `step`, `gridH`, `mockClutches`. All exposed as live panel sliders.
+
+### Headless preview (my eyes — no browser in the agent session)
+
+`node services/renderer/preview.mjs <data.json> <out.svg> '<optsJSON>'` writes a zero-dep SVG of the layout polylines (no spray grain, just composition), then `magick -background "#f4f0e7" out.svg out.png` rasterizes it to a PNG I can read. Use this to verify sweep/density/gravity before claiming the look. node-canvas was tried and abandoned (native build needs system libs / pnpm blocks build scripts). Examples saved: `out/preview-sample.png` (orange/blue, looks like his), `out/preview-real.png` (FURIA black / Falcons green).
 
 Background data texture: faint repeated map scores + round W/L glyphs behind the canvas (`.bg-data`, z-index 0; canvas z-1; text overlay z-2 — explicit stacking fixes the old bug where the opaque canvas hid the header).
 
@@ -64,8 +76,9 @@ Feed the `hltv` lib a Cloudflare clearance cookie via `HLTV.createInstance({ loa
 
 - 20 gate tests pass (`pnpm test`).
 - Real match scraped: `data/m2395002.json` = **FURIA 0–3 Falcons** (bo5, Mirage/Anubis/Inferno, all 8–13, 21 rounds each).
-- Renderer rewritten to the flow-field technique above, then upgraded: per-point pressure taper, low-opacity layering, live tuning panel, switchable brushes, background data texture, fixed canvas/text stacking. 20 tests pass.
-- View: `pnpm render` → <http://localhost:5173/?data=/data/m2395002.json> (hard-refresh after JS edits). Sample (denser, has real attractors): <http://localhost:5173/>. Tune with the left panel; bake good slider values into `layout.js DEFAULTS`.
+- Renderer rewritten to the grid-of-rounds model on cream ground (see model above). Composition validated via headless SVG preview — matches his look (orange/blue sweeps, gravity swirl, blend). 21 tests pass.
+- View: `pnpm render` → <http://localhost:5173/?data=/data/m2395002.json> (hard-refresh after JS edits). Sample (orange/blue, prettiest): <http://localhost:5173/>. Tune with the left panel; bake good slider values into `layout.js DEFAULTS`.
+- Open tuning Qs for the user: line fineness/count, swirl strength (the tight whorls at wells), whether to crank density further toward the fully-blended gradient of his final.
 
 ### Open / next
 

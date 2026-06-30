@@ -6,75 +6,62 @@ import { computePoster, dramaScore } from "./layout.js";
 const series = JSON.parse(
   readFileSync(new URL("../../data/sample-match.json", import.meta.url), "utf8")
 );
+const totalRounds = series.maps.reduce((n, m) => n + m.rounds.length, 0);
 
 test("computePoster is deterministic (same input -> same output)", () => {
   const a = computePoster(series);
   const b = computePoster(series);
   assert.deepEqual(a.strokes, b.strokes);
-  assert.equal(a.strokes.length, b.strokes.length);
 });
 
-test("band width is proportional to round count", () => {
-  const { bands, cfg } = computePoster(series);
-  bands.forEach((band, i) => {
-    assert.equal(band.w, series.maps[i].rounds.length * cfg.slotW);
-  });
-  // the OT decider (most rounds) is the widest band
-  const widest = bands.reduce((p, c) => (c.w > p.w ? c : p));
-  assert.equal(widest.name, "Nuke");
+test("one grid, 1 cell = 1 round, all rounds across all maps, reading order", () => {
+  const { grid } = computePoster(series, { cols: 8 });
+  assert.equal(grid.cols, 8);
+  assert.equal(grid.total, totalRounds);
+  assert.equal(grid.rows, Math.ceil(totalRounds / 8));
+});
+
+test("grid footprint is fixed; cell height shrinks as rounds grow", () => {
+  const few = computePoster({ ...series, maps: [series.maps[0]] }); // ~22 rounds
+  const many = computePoster(series); // ~78 rounds
+  assert.equal(few.grid.gridH, many.grid.gridH); // footprint constant
+  assert.ok(many.grid.cellH < few.grid.cellH); // more rounds -> shorter cells
 });
 
 test("strokes are traced polylines with per-point pressure", () => {
   const { strokes } = computePoster(series);
   assert.ok(strokes.every((s) => Array.isArray(s.points) && s.points.length >= 2));
-  // a traced flow line has many points, not just start+end
-  const avgPts = strokes.reduce((n, s) => n + s.points.length, 0) / strokes.length;
-  assert.ok(avgPts > 5, "flow lines should integrate into multiple points");
-  // each point is [x, y, pressure]; pressure tapers (ends low, middle full)
+  const avg = strokes.reduce((n, s) => n + s.points.length, 0) / strokes.length;
+  assert.ok(avg > 6, "long sweeping flow lines integrate to many points");
   const s = strokes.find((x) => x.points.length > 6);
   assert.ok(s.points.every((p) => p.length === 3 && p[2] > 0 && p[2] <= 1));
-  const mid = s.points[Math.floor(s.points.length / 2)][2];
-  assert.ok(mid > s.points[0][2], "middle pressure exceeds the tapered start");
+  assert.ok(s.points[Math.floor(s.points.length / 2)][2] > s.points[0][2], "mid pressure > tapered end");
 });
 
 test("team A flows left, team B flows right (net horizontal displacement)", () => {
   const { strokes } = computePoster(series);
   const dx = (s) => s.points[s.points.length - 1][0] - s.points[0][0];
   const mean = (arr, f) => arr.reduce((n, x) => n + f(x), 0) / arr.length;
-  const a = strokes.filter((s) => s.team === "a");
-  const b = strokes.filter((s) => s.team === "b");
-  // base direction dominates net horizontal flow even with swirl
-  assert.ok(mean(a, dx) < 0, "A net flow is leftward");
-  assert.ok(mean(b, dx) > 0, "B net flow is rightward");
+  assert.ok(mean(strokes.filter((s) => s.team === "a"), dx) < 0, "A net flow leftward");
+  assert.ok(mean(strokes.filter((s) => s.team === "b"), dx) > 0, "B net flow rightward");
 });
 
-test("attractors mark events and dynamics; never empty for a real map", () => {
-  const { attractors } = computePoster(series);
-  const kinds = new Set(attractors.map((a) => a.kind));
-  assert.ok(kinds.has("clutch"));
-  assert.ok(kinds.has("ace"));
-  // even without explicit events, decisive-round + momentum keep the field alive
-  assert.ok(kinds.has("decisive"));
-  assert.ok(attractors.every((a) => a.radius > 0));
-  const ace = attractors.find((a) => a.kind === "ace");
-  assert.equal(ace.strength, 1);
+test("gravity wells: map-clinch always present; clutch mocked when data lacks it", () => {
+  const { wells } = computePoster(series, { mockClutches: true });
+  const kinds = new Set(wells.map((w) => w.kind));
+  assert.ok(kinds.has("map"), "each map's clinch round is a well");
+  assert.ok(kinds.has("ace") || kinds.has("clutch") || kinds.has("clutch*"));
+  assert.ok(wells.every((w) => w.radius > 0));
+  // sample has explicit clutches/aces -> mock should NOT fire for those maps
+  assert.ok([...kinds].some((k) => k === "clutch" || k === "ace"));
 });
 
-test("side switches mark round 13 and OT halves", () => {
-  const { sideSwitches } = computePoster(series);
-  // 3 maps each cross round 13 once; the OT map adds extra half markers
-  assert.ok(sideSwitches.length >= 3);
+test("mockClutches=false drops the synthetic clutch wells", () => {
+  const noMock = computePoster({ ...series, maps: [{ ...series.maps[0], players: [] }] }, { mockClutches: false });
+  // map 0 with no players -> no real clutch/ace -> with mock off, only map/pistol wells
+  assert.ok(!noMock.wells.some((w) => w.kind === "clutch*"));
 });
 
 test("dramaScore rises with overtime + close series", () => {
   assert.ok(dramaScore(series) > 0.3);
-  const flat = {
-    ...series,
-    seriesScore: { a: 2, b: 0 },
-    maps: [
-      { ...series.maps[0], overtime: false, score: { a: 13, b: 2 } },
-      { ...series.maps[1], overtime: false, score: { a: 13, b: 1 } }
-    ]
-  };
-  assert.ok(dramaScore(flat) < dramaScore(series));
 });

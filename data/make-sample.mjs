@@ -70,8 +70,8 @@ const series = {
   sourceUrl: "synthetic",
   format: "bo3",
   teams: {
-    a: { name: "Team A", color: "#e4b343" },
-    b: { name: "Team B", color: "#3a6ea5" }
+    a: { name: "Team A", color: "#d2691e" },
+    b: { name: "Team B", color: "#2f5fa6" }
   },
   seriesScore: { a: 2, b: 1 },
   maps: [

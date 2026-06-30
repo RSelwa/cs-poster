@@ -1,33 +1,43 @@
 // Pure, deterministic: a contract-valid series -> poster geometry.
-// No p5, no DOM. Same input -> same output, so it is unit-tested in layout.test.js.
+// No p5, no DOM. Same input -> same output, unit-tested in layout.test.js.
 //
-// The core idea, lifted from Zeh Fernandes' World Cup posters: events are
-// "gravity points" in a vector field. Every stroke starts at its round's cell,
-// heads in its team's direction (team A left, team B right), and is integrated
-// step by step THROUGH the field, so it bends. Near an attractor the field
-// gains a tangential (swirl) component, so lines orbit the point rather than
-// just being pulled into it. Drama strengthens the swirl. Attractors are never
-// drawn — the bending is the visualization.
+// Model (matching Zeh Fernandes' World Cup posters, adapted to CS2):
+//   - ONE continuous grid for the whole series. 1 cell = 1 round. All rounds of
+//     all maps fill cells in reading order (left->right, top->bottom), in match
+//     chronological order, with NO break between maps. Grid footprint is fixed;
+//     cells subdivide to hold however many rounds (fixed columns, rows grow,
+//     cell height shrinks).
+//   - Each cell emits brush strokes in the ROUND WINNER's color, flowing left
+//     (team A) or right (team B). Strokes are long and integrated step-by-step
+//     THROUGH a vector field, so they curve.
+//   - "Importance" rounds are gravity points: the field gains a tangential
+//     (swirl) component near them, so lines orbit. Football used shots; we use
+//     map-clinch rounds, pistols, streaks, + mocked clutches (real clutch data
+//     is Cloudflare-blocked; mock is seeded + clearly flagged).
 //
-// sketch.js only paints the polylines this produces; it computes nothing.
+// sketch.js only paints what this returns.
 
 export const DEFAULTS = {
-  width: 1280,
-  margin: 90,
-  headerH: 210,
-  bandH: 360,
-  bandGap: 70,
-  slotW: 30, // px per round -> map width is proportional to round count
-  strokesPerRound: 5,
-  baseLen: 150, // base stroke length (integrated arc length, px)
-  step: 7, // integration step in px
-  pull: 0.45, // radial component (toward attractor)
-  swirl: 1.15, // tangential component (orbit) — the "gravity swirl"
-  ambient: 0.16, // ambient curl so far-from-event lines aren't dead straight
-  taper: 0.45 // pressure at the stroke ends (1 = no taper); mid is always full
+  width: 1100,
+  margin: 95,
+  headerH: 140,
+  footerH: 120,
+  gridH: 1160, // fixed grid footprint height -> "grid size stays the same"
+  cols: 8, // fixed columns; rows = ceil(totalRounds / cols)
+  strokesPerCell: 30,
+  baseLenFrac: 0.72, // stroke length as a fraction of inner width (long sweeps)
+  lenVar: 0.5,
+  step: 7, // field integration step (px)
+  pull: 0.5, // radial component (toward well)
+  swirl: 1.25, // tangential component (orbit) — the gravity swirl
+  ambient: 0.14, // ambient curl so far-from-well lines aren't dead straight
+  taper: 0.4, // pressure at stroke ends (mid is always full)
+  weightMin: 0.5,
+  weightMax: 1.6,
+  wellRadiusFrac: 0.3, // well influence radius as fraction of inner width
+  mockClutches: true // seed fake clutch rounds when real ones are absent
 };
 
-// seeded LCG -> deterministic "noise" (no Math.random, stays reproducible)
 function rng(seed) {
   let s = seed >>> 0 || 1;
   return () => ((s = (s * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
@@ -35,71 +45,75 @@ function rng(seed) {
 
 export function computePoster(series, opts = {}) {
   const cfg = { ...DEFAULTS, ...opts };
-  const maps = series.maps;
   const drama = dramaScore(series);
 
-  const maxRounds = Math.max(...maps.map((m) => m.rounds.length));
-  const innerW = maxRounds * cfg.slotW;
-  const width = cfg.width || innerW + cfg.margin * 2;
-  const height =
-    cfg.headerH + cfg.margin * 2 + maps.length * cfg.bandH + (maps.length - 1) * cfg.bandGap;
+  // flatten all rounds into one chronological list, each tagged with its map
+  const flat = [];
+  series.maps.forEach((map, mapIdx) => {
+    map.rounds.forEach((r) => flat.push({ ...r, mapIdx, mapName: map.name, map }));
+  });
+  const total = flat.length;
 
-  const bands = [];
-  const attractors = [];
-  const sideSwitches = [];
-  const strokeSeeds = []; // {x,y,baseDir,len,color,weight,team,round}
+  const innerW = cfg.width - cfg.margin * 2;
+  const cols = Math.max(1, Math.round(cfg.cols));
+  const rows = Math.ceil(total / cols);
+  const cellW = innerW / cols;
+  const cellH = cfg.gridH / rows;
+  const gridTop = cfg.headerH;
+  const width = cfg.width;
+  const height = cfg.headerH + cfg.gridH + cfg.footerH;
 
-  maps.forEach((map, mi) => {
-    const y = cfg.headerH + cfg.margin + mi * (cfg.bandH + cfg.bandGap);
-    const bandW = map.rounds.length * cfg.slotW;
-    const x = (width - innerW) / 2;
-    const cy = y + cfg.bandH / 2;
+  const cellCenter = (i) => {
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    return [cfg.margin + (col + 0.5) * cellW, gridTop + (row + 0.5) * cellH];
+  };
 
-    bands.push({
-      name: map.name,
-      scoreA: map.score.a,
-      scoreB: map.score.b,
-      x, y, w: bandW, h: cfg.bandH,
-      decider: !!map.decider,
-      overtime: !!map.overtime,
-      winner: map.winner
-    });
-
-    attractors.push(...deriveAttractors(map, x, cy, cfg, drama));
-
-    map.rounds.forEach((r, ri) => {
-      const slotX = x + (ri + 0.5) * cfg.slotW;
-      const rand = rng((mi + 1) * 100003 + r.n * 31 + (r.winner === "a" ? 7 : 13));
-      const color = series.teams[r.winner].color;
-      const baseDir = r.winner === "a" ? Math.PI : 0; // left vs right
-
-      const kills = Number.isFinite(r.kills) ? r.kills : 5;
-      const count = Math.max(3, Math.round(cfg.strokesPerRound * (kills / 6)));
-      const lenBoost = (1 + drama * 0.45) * (map.decider ? 1.2 : 1) *
-        (r.winType === "elimination" ? 1.1 : 0.95);
-
-      for (let k = 0; k < count; k++) {
-        strokeSeeds.push({
-          x: slotX + (rand() - 0.5) * cfg.slotW * 0.6,
-          y: cy + (rand() - 0.5) * cfg.bandH * 0.28,
-          baseDir,
-          len: cfg.baseLen * lenBoost * (0.8 + rand() * 0.55),
-          color,
-          weight: 1.4 + rand() * 2.2 + (map.decider ? 0.6 : 0),
-          team: r.winner,
-          round: r.n
-        });
-      }
-
-      if (r.n === 13 || (map.overtime && r.n > 24 && (r.n - 25) % 3 === 0)) {
-        sideSwitches.push({ x: slotX - cfg.slotW / 2, y, h: cfg.bandH });
-      }
-    });
+  // mark importance flags per global round index
+  const clutchSet = new Set();
+  const aceSet = new Set();
+  flat.forEach((r, i) => {
+    for (const p of r.map.players || []) {
+      if ((p.clutches || []).some((c) => c.round === r.n)) clutchSet.add(i);
+      if ((p.aces || []).includes(r.n)) aceSet.add(i);
+    }
   });
 
-  // integrate every stroke through the shared field -> curved polylines
-  const field = buildField(attractors, drama, cfg);
-  const strokes = strokeSeeds.map((s) => ({
+  const wells = deriveWells(series, flat, cellCenter, innerW, cfg, drama, clutchSet, aceSet);
+
+  // strokes: one cluster per round-cell, in the winner's color, flowing to side
+  const seeds = [];
+  flat.forEach((r, i) => {
+    const [cx, cy] = cellCenter(i);
+    const rand = rng((r.mapIdx + 1) * 100003 + r.n * 131 + (r.winner === "a" ? 7 : 13));
+    const color = series.teams[r.winner].color;
+    const baseDir = r.winner === "a" ? Math.PI : 0;
+
+    const importance =
+      1 +
+      (clutchSet.has(i) ? 1.3 : 0) +
+      (aceSet.has(i) ? 1.0 : 0) +
+      (isMockClutch(i, flat, cfg, clutchSet) ? 1.1 : 0) +
+      (isMapClinch(i, flat) ? 0.7 : 0) +
+      (isPistol(r.n) ? 0.25 : 0);
+    const count = Math.max(3, Math.round(cfg.strokesPerCell * importance));
+
+    for (let k = 0; k < count; k++) {
+      seeds.push({
+        x: cx + (rand() - 0.5) * cellW * 1.4,
+        y: cy + (rand() - 0.5) * cellH * 1.4,
+        baseDir,
+        len: innerW * (cfg.baseLenFrac + (rand() - 0.5) * cfg.lenVar),
+        color,
+        weight: cfg.weightMin + rand() * (cfg.weightMax - cfg.weightMin),
+        team: r.winner,
+        round: r.n
+      });
+    }
+  });
+
+  const field = buildField(wells, drama, cfg);
+  const strokes = seeds.map((s) => ({
     points: trace(s.x, s.y, s.baseDir, s.len, field, cfg.step, cfg.taper),
     color: s.color,
     weight: s.weight,
@@ -107,8 +121,21 @@ export function computePoster(series, opts = {}) {
     round: s.round
   }));
 
+  // tiny map markers at the first cell of each map (minimal text)
+  const mapMarkers = [];
+  let acc = 0;
+  series.maps.forEach((m) => {
+    const [mx, my] = cellCenter(acc);
+    mapMarkers.push({ x: mx, y: my, name: m.name, scoreA: m.score.a, scoreB: m.score.b, decider: !!m.decider });
+    acc += m.rounds.length;
+  });
+
+  const gridCols = Array.from({ length: cols + 1 }, (_, c) => cfg.margin + c * cellW);
+  const gridRows = Array.from({ length: rows + 1 }, (_, r) => gridTop + r * cellH);
+
   return {
-    width, height, bands, strokes, attractors, sideSwitches,
+    width, height, strokes, wells, mapMarkers,
+    grid: { cols, rows, cellW, cellH, gridTop, gridH: cfg.gridH, margin: cfg.margin, innerW, gridCols, gridRows, total },
     header: {
       event: series.event,
       stage: series.stage || "",
@@ -118,41 +145,37 @@ export function computePoster(series, opts = {}) {
       seriesScore: series.seriesScore,
       format: series.format
     },
+    drama,
     cfg
   };
 }
 
 // Field angle at (x,y) for a stroke whose base flow is baseDir.
-function buildField(attractors, drama, cfg) {
+function buildField(wells, drama, cfg) {
   return (x, y, baseDir) => {
     let vx = Math.cos(baseDir);
     let vy = Math.sin(baseDir);
-    for (const a of attractors) {
-      const dx = a.x - x;
-      const dy = a.y - y;
+    for (const w of wells) {
+      const dx = w.x - x;
+      const dy = w.y - y;
       const d = Math.hypot(dx, dy) || 1;
-      if (d > a.radius) continue;
-      const fall = 1 - d / a.radius; // 1 at center -> 0 at edge
-      const rinx = dx / d, riny = dy / d; // unit toward attractor
-      const tanx = -riny, tany = rinx; // perpendicular -> orbit
-      const w = fall * fall * a.strength;
-      vx += w * (cfg.pull * rinx + cfg.swirl * (0.4 + drama) * tanx);
-      vy += w * (cfg.pull * riny + cfg.swirl * (0.4 + drama) * tany);
+      if (d > w.radius) continue;
+      const fall = 1 - d / w.radius;
+      const rinx = dx / d, riny = dy / d;
+      const tanx = -riny, tany = rinx;
+      const wgt = fall * fall * w.strength;
+      vx += wgt * (cfg.pull * rinx + cfg.swirl * (0.4 + drama) * tanx);
+      vy += wgt * (cfg.pull * riny + cfg.swirl * (0.4 + drama) * tany);
     }
     const amb = cfg.ambient * Math.sin(x * 0.012 + y * 0.015);
     return Math.atan2(vy, vx) + amb;
   };
 }
 
-// Walk the field from a start point, accumulating arc length, until `len`.
-// Each point carries a pressure (3rd element) so the brush tapers: thin at the
-// ends, full through the middle. Uniform pressure is what made v2 look like
-// dead tubes; the taper is what reads as a real brush mark.
 function trace(x0, y0, baseDir, len, field, step, taper) {
   const xy = [[x0, y0]];
-  let x = x0, y = y0, acc = 0;
-  let guard = 0;
-  while (acc < len && guard++ < 400) {
+  let x = x0, y = y0, acc = 0, guard = 0;
+  while (acc < len && guard++ < 600) {
     const a = field(x, y, baseDir);
     x += Math.cos(a) * step;
     y += Math.sin(a) * step;
@@ -161,15 +184,14 @@ function trace(x0, y0, baseDir, len, field, step, taper) {
   }
   const n = xy.length;
   return xy.map(([px, py], i) => {
-    const t = n > 1 ? i / (n - 1) : 0; // 0..1 along the stroke
-    const pressure = taper + (1 - taper) * Math.sin(Math.PI * t); // ends->mid->ends
+    const t = n > 1 ? i / (n - 1) : 0;
+    const pressure = taper + (1 - taper) * Math.sin(Math.PI * t);
     return [px, py, round2(pressure)];
   });
 }
 
 const round2 = (v) => Math.round(v * 100) / 100;
 
-// Drama 0..~1: overtime, comebacks, close maps, high round totals.
 export function dramaScore(series) {
   let d = 0;
   for (const m of series.maps) {
@@ -181,49 +203,38 @@ export function dramaScore(series) {
   return Math.min(1, d / series.maps.length);
 }
 
-// Gravity points for a map, in canvas coords. Explicit events (clutch/ace/plant)
-// pull hard; when those are absent (reconstructed data), match dynamics still
-// give the composition something to bend around: the decisive round and the
-// biggest momentum streak.
-function deriveAttractors(map, bandX, cy, cfg, drama) {
-  const xOf = (n) => bandX + (n - 0.5) * cfg.slotW;
-  const seen = new Map();
-  const put = (n, kind, strength) => {
-    const cur = seen.get(n);
-    if (!cur || strength > cur.strength) seen.set(n, { n, kind, strength });
-  };
-
-  for (const p of map.players || []) {
-    for (const c of p.clutches || []) put(c.round, "clutch", 0.6 + (c.vs || 1) * 0.12);
-    for (const r of p.aces || []) put(r, "ace", 1);
-  }
-  for (const r of map.rounds) if (r.bombPlant) put(r.n, "plant", 0.32);
-
-  // decisive round: the last round of the map (match point landed here)
-  const last = map.rounds[map.rounds.length - 1];
-  if (last) put(last.n, "decisive", 0.8);
-
-  // biggest momentum streak -> attractor at its midpoint
-  const streak = longestStreak(map.rounds);
-  if (streak.len >= 4) put(Math.round((streak.start + streak.end) / 2), "momentum", Math.min(0.9, streak.len / 7));
-
-  return [...seen.values()].map((a) => ({
-    x: xOf(a.n),
-    y: cy + (a.kind === "ace" ? -30 : a.kind === "clutch" ? 25 : 0),
-    strength: a.strength,
-    kind: a.kind,
-    round: a.n,
-    radius: 200 + a.strength * 160 + drama * 80
-  }));
+// global-index predicates over the flattened round list
+function isPistol(n) {
+  return n === 1 || n === 13 || (n > 24 && (n - 25) % 3 === 0);
+}
+function isMapClinch(i, flat) {
+  const r = flat[i];
+  const next = flat[i + 1];
+  return !next || next.mapIdx !== r.mapIdx; // last round of its map
+}
+// deterministic stand-in for clutches when real data is absent: the ~60% round
+// of each map. Only active when the map truly has no real clutch.
+function isMockClutch(i, flat, cfg, clutchSet) {
+  if (!cfg.mockClutches) return false;
+  const r = flat[i];
+  if ([...clutchSet].some((ci) => flat[ci].mapIdx === r.mapIdx)) return false; // real clutch exists
+  const mapRounds = flat.filter((x) => x.mapIdx === r.mapIdx);
+  const target = mapRounds[Math.floor(mapRounds.length * 0.6)];
+  return target && target.n === r.n;
 }
 
-function longestStreak(rounds) {
-  let best = { len: 0, start: 1, end: 1 };
-  let curLen = 0, curStart = 1, prev = null;
-  rounds.forEach((r) => {
-    if (r.winner === prev) curLen++;
-    else { curLen = 1; curStart = r.n; prev = r.winner; }
-    if (curLen > best.len) best = { len: curLen, start: curStart, end: r.n };
+function deriveWells(series, flat, cellCenter, innerW, cfg, drama, clutchSet, aceSet) {
+  const wells = [];
+  const baseR = innerW * cfg.wellRadiusFrac;
+  const add = (i, kind, strength) => {
+    const [x, y] = cellCenter(i);
+    wells.push({ x, y, strength, kind, round: flat[i].n, mapName: flat[i].mapName, radius: baseR * (0.6 + strength) });
+  };
+  flat.forEach((r, i) => {
+    if (aceSet.has(i)) add(i, "ace", 1);
+    else if (clutchSet.has(i)) add(i, "clutch", 0.85);
+    else if (isMockClutch(i, flat, cfg, clutchSet)) add(i, "clutch*", 0.8);
+    if (isMapClinch(i, flat)) add(i, "map", 0.9);
   });
-  return best;
+  return wells;
 }

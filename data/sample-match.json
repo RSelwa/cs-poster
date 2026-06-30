@@ -7,11 +7,11 @@
   "teams": {
     "a": {
       "name": "Team A",
-      "color": "#e4b343"
+      "color": "#d2691e"
     },
     "b": {
       "name": "Team B",
-      "color": "#3a6ea5"
+      "color": "#2f5fa6"
     }
   },
   "seriesScore": {

@@ -1,30 +1,28 @@
-// Renders poster geometry (from layout.js) with p5.brush, plus a crisp DOM
-// text overlay and a live parameter panel. Pure drawing — all geometry/field
-// math lives in layout.js; this file computes nothing about composition.
+// Paints poster geometry (layout.js) with p5.brush on a light ground, plus a
+// minimal DOM text overlay and a live tuning panel. Computes no composition.
 //
-// Why spline-over-traced-points instead of brush.flowLine: p5.brush's field
-// sets each step's heading to (field - plotAngle), i.e. the field replaces
-// direction. A single global field can't give team A leftward AND team B
-// rightward flow at once. So layout.js owns the field (base dir + gravity
-// perturbation, deterministic + testable) and emits polylines with per-point
-// pressure; here we just paint them with the chosen brush.
+// Why brush.spline over points (not brush.flowLine): p5.brush's field sets each
+// step heading = field - plotAngle (field replaces direction), so one global
+// field can't do team-A-left AND team-B-right. layout.js owns the field and
+// emits curved polylines with per-point pressure; here we just stroke them.
 import p5 from "p5";
 import * as brush from "p5.brush";
 import { computePoster, DEFAULTS } from "./layout.js";
 
-const BG = "#0e0d11";
+const PAPER = "#f4f0e7"; // cream ground
+const INK = "#1c1a17";
 const $ = (id) => document.getElementById(id);
 
-// layout knobs exposed as sliders (Zeh's "interface to iterate on the rules")
 const KNOBS = [
+  { key: "cols", min: 4, max: 14, step: 1 },
+  { key: "strokesPerCell", min: 4, max: 60, step: 2 },
+  { key: "baseLenFrac", min: 0.2, max: 1.4, step: 0.05 },
+  { key: "lenVar", min: 0, max: 1, step: 0.05 },
   { key: "swirl", min: 0, max: 2.5, step: 0.05 },
   { key: "pull", min: 0, max: 1.5, step: 0.05 },
-  { key: "ambient", min: 0, max: 0.6, step: 0.02 },
-  { key: "baseLen", min: 60, max: 340, step: 10 },
-  { key: "strokesPerRound", min: 1, max: 14, step: 1 },
+  { key: "ambient", min: 0, max: 0.5, step: 0.02 },
   { key: "taper", min: 0.05, max: 1, step: 0.05 },
-  { key: "slotW", min: 14, max: 64, step: 2 },
-  { key: "bandH", min: 200, max: 540, step: 20 },
+  { key: "wellRadiusFrac", min: 0.1, max: 0.6, step: 0.02 },
   { key: "step", min: 4, max: 14, step: 1 }
 ];
 const BRUSHES = ["spray", "marker", "marker2", "2B", "HB", "charcoal", "pen", "rotring", "cpencil"];
@@ -32,8 +30,11 @@ const BRUSHES = ["spray", "marker", "marker2", "2B", "HB", "charcoal", "pen", "r
 let p5instance = null;
 let lastPoster = null;
 let currentSeries = null;
-const overrides = { width: 1280 };
-const renderOpts = { brush: "spray", opacity: 0.85, curvature: 0.5, brushScale: 1.1, bgTexture: true };
+const overrides = {};
+const renderOpts = {
+  brush: "spray", opacity: 0.32, curvature: 0.5, brushScale: 0.9,
+  showGrid: false, showWells: true, mockClutches: true, bgTexture: true
+};
 
 async function loadSeries(url) {
   const res = await fetch(url);
@@ -43,7 +44,7 @@ async function loadSeries(url) {
 
 function render() {
   if (!currentSeries) return;
-  const poster = computePoster(currentSeries, overrides);
+  const poster = computePoster(currentSeries, { ...overrides, mockClutches: renderOpts.mockClutches });
   lastPoster = poster;
   if (p5instance) p5instance.remove();
   buildOverlay(poster, currentSeries);
@@ -63,32 +64,32 @@ function render() {
     };
     p.draw = () => {
       p.translate(-poster.width / 2, -poster.height / 2);
-      p.background(BG);
-      drawSideSwitches(p, poster);
+      p.background(PAPER);
+      if (renderOpts.showGrid) drawGrid(p, poster);
       drawStrokes(p, poster);
+      if (renderOpts.showWells) drawWells(p, poster);
     };
   };
   p5instance = new p5(sketch);
 }
 
-function drawSideSwitches(p, poster) {
+function drawGrid(p, poster) {
+  const g = poster.grid;
   p.push();
-  p.stroke(255, 255, 255, 18);
-  p.strokeWeight(1);
-  for (const s of poster.sideSwitches) p.line(s.x, s.y, s.x, s.y + s.h);
+  p.stroke(INK);
+  p.drawingContext.globalAlpha = 0.12;
+  p.strokeWeight(0.6);
+  for (const x of g.gridCols) p.line(x, g.gridTop, x, g.gridTop + g.gridH);
+  for (const y of g.gridRows) p.line(g.margin, y, g.margin + g.innerW, y);
+  p.drawingContext.globalAlpha = 1;
   p.pop();
 }
 
-// Paint each pre-traced flow polyline. Points are [x, y, pressure] so the brush
-// tapers along the stroke. Many strokes at low opacity build depth.
+// Many long thin low-opacity flow lines, layered -> they blend into a gradient.
 function drawStrokes(p, poster) {
   const haveBrush = typeof brush.spline === "function";
   if (haveBrush) {
-    try {
-      brush.scaleBrushes?.(renderOpts.brushScale);
-    } catch {
-      /* optional */
-    }
+    try { brush.scaleBrushes?.(renderOpts.brushScale); } catch { /* optional */ }
   }
   const alpha = Math.round(renderOpts.opacity * 255);
   for (const s of poster.strokes) {
@@ -100,9 +101,7 @@ function drawStrokes(p, poster) {
         brush.set(renderOpts.brush, col, s.weight);
         brush.spline(s.points, renderOpts.curvature);
         continue;
-      } catch {
-        /* fall through to native */
-      }
+      } catch { /* fall through */ }
     }
     const col = p.color(s.color);
     col.setAlpha(alpha);
@@ -118,8 +117,31 @@ function drawStrokes(p, poster) {
   }
 }
 
-// Crisp text as positioned DOM over the canvas (WEBGL text needs a font file;
-// DOM stays sharp and html2canvas snapshots canvas + DOM together into the PNG).
+// Gravity wells, faint like his final: thin circle + crosshair. Round-number
+// label is drawn in the DOM overlay so it stays crisp.
+function drawWells(p, poster) {
+  p.push();
+  p.noFill();
+  for (const w of poster.wells) {
+    const c = p.color(w.kind === "map" ? INK : w.kind.startsWith("clutch") ? "#c2641e" : "#2f5fa6");
+    c.setAlpha(120);
+    p.stroke(c);
+    p.strokeWeight(0.8);
+    p.circle(w.x, w.y, 18);
+    const arm = 13;
+    p.line(w.x - arm, w.y, w.x + arm, w.y);
+    p.line(w.x, w.y - arm, w.x, w.y + arm);
+    c.setAlpha(200);
+    p.fill(c);
+    p.noStroke();
+    p.circle(w.x, w.y, 4);
+    p.noFill();
+  }
+  p.pop();
+}
+
+// Minimal DOM text: tiny map markers, faint well round-labels, and a small
+// boxed score block bottom-right (his only real text). No big header.
 function buildOverlay(poster, series) {
   const host = $("canvas-host");
   host.style.width = poster.width + "px";
@@ -128,10 +150,8 @@ function buildOverlay(poster, series) {
 
   if (renderOpts.bgTexture) {
     const unit = series.maps
-      .map((m) => {
-        const seq = m.rounds.map((r) => (r.winner === "a" ? "▮" : "▯")).join("");
-        return `${m.name.toUpperCase()} ${m.score.a}-${m.score.b}  ${seq}`;
-      })
+      .map((m) => `${m.name.toUpperCase()} ${m.score.a}-${m.score.b}  ` +
+        m.rounds.map((r) => (r.winner === "a" ? "▮" : "▯")).join(""))
       .join("   //   ");
     const bg = document.createElement("div");
     bg.className = "bg-data";
@@ -139,7 +159,6 @@ function buildOverlay(poster, series) {
     host.appendChild(bg);
   }
 
-  const h = poster.header;
   const add = (cls, html, style) => {
     const d = document.createElement("div");
     d.className = "overlay " + cls;
@@ -148,34 +167,34 @@ function buildOverlay(poster, series) {
     host.appendChild(d);
   };
 
-  add(
-    "header",
-    `<div class="event">${h.event}${h.stage ? " · " + h.stage : ""}</div>
-     <div class="title">
-       <span style="color:${h.teamA.color}">${h.teamA.name}</span>
-       <span class="score">${h.seriesScore.a}–${h.seriesScore.b}</span>
-       <span style="color:${h.teamB.color}">${h.teamB.name}</span>
-     </div>
-     <div class="date">${h.date || ""} · ${(h.format || "").toUpperCase()}</div>`,
-    { left: "0", top: "40px", width: poster.width + "px" }
-  );
-
-  for (const b of poster.bands) {
-    add(
-      "maplabel",
-      `<span class="mapname">${b.name}</span>
-       <span class="mapscore">${b.scoreA}–${b.scoreB}</span>
-       ${b.overtime ? '<span class="tag">OT</span>' : ""}
-       ${b.decider ? '<span class="tag dec">DECIDER</span>' : ""}`,
-      { left: b.x + "px", top: b.y - 30 + "px", width: b.w + "px" }
-    );
+  for (const m of poster.mapMarkers) {
+    add("maptag", `${m.name.toUpperCase()} ${m.scoreA}-${m.scoreB}`,
+      { left: m.x + 10 + "px", top: m.y - 8 + "px" });
   }
+
+  if (renderOpts.showWells) {
+    for (const w of poster.wells) {
+      const label = w.kind === "map" ? `R${w.round}` : w.kind.startsWith("clutch") ? `CLUTCH${w.kind.endsWith("*") ? "*" : ""}` : w.kind.toUpperCase();
+      add("welllabel", label, { left: w.x + 12 + "px", top: w.y - 26 + "px" });
+    }
+  }
+
+  const h = poster.header;
+  add(
+    "scorebox",
+    `<div class="teams">
+       <div><span style="color:${h.teamA.color}">●</span> ${h.teamA.name} <b>${h.seriesScore.a}</b></div>
+       <div><span style="color:${h.teamB.color}">●</span> ${h.teamB.name} <b>${h.seriesScore.b}</b></div>
+     </div>
+     <div class="meta">${(h.format || "").toUpperCase()}<br>${h.event}${h.date ? "<br>" + h.date : ""}</div>`,
+    { right: poster.cfg.margin + "px", bottom: "46px" }
+  );
 }
 
 async function savePng() {
   const host = $("canvas-host");
   const { default: html2canvas } = await import("html2canvas");
-  const canvas = await html2canvas(host, { backgroundColor: BG, scale: 2, useCORS: true });
+  const canvas = await html2canvas(host, { backgroundColor: PAPER, scale: 2, useCORS: true });
   const a = document.createElement("a");
   const name = (lastPoster?.header.event || "poster").replace(/\W+/g, "-").toLowerCase();
   a.download = `${name}.png`;
@@ -212,7 +231,7 @@ function buildPanel() {
   brushSel.addEventListener("change", () => { renderOpts.brush = brushSel.value; render(); });
   mk("brush", brushSel);
 
-  for (const [key, min, max, step] of [["opacity", 0.1, 1, 0.05], ["curvature", 0, 1, 0.05], ["brushScale", 0.5, 2.5, 0.1]]) {
+  for (const [key, min, max, step] of [["opacity", 0.05, 1, 0.02], ["curvature", 0, 1, 0.05], ["brushScale", 0.4, 2, 0.1]]) {
     const inp = document.createElement("input");
     Object.assign(inp, { type: "range", min, max, step, value: renderOpts[key] });
     const row = mk(`${key} <b>${renderOpts[key]}</b>`, inp);
@@ -223,10 +242,12 @@ function buildPanel() {
     });
   }
 
-  const tex = document.createElement("input");
-  Object.assign(tex, { type: "checkbox", checked: renderOpts.bgTexture });
-  tex.addEventListener("change", () => { renderOpts.bgTexture = tex.checked; render(); });
-  mk("bg data texture", tex);
+  for (const key of ["showGrid", "showWells", "mockClutches", "bgTexture"]) {
+    const inp = document.createElement("input");
+    Object.assign(inp, { type: "checkbox", checked: renderOpts[key] });
+    inp.addEventListener("change", () => { renderOpts[key] = inp.checked; render(); });
+    mk(key, inp);
+  }
 }
 
 async function boot() {
@@ -237,9 +258,8 @@ async function boot() {
     currentSeries = await loadSeries(dataUrl);
     render();
   } catch (e) {
-    $("canvas-host").innerHTML = `<p style="color:#f66">${e.message}</p>`;
+    $("canvas-host").innerHTML = `<p style="color:#c33;padding:20px">${e.message}</p>`;
   }
-
   $("file").addEventListener("change", async (ev) => {
     const f = ev.target.files[0];
     if (!f) return;
