@@ -1,0 +1,8 @@
+node_modules/
+.env
+out/*.png
+data/*.json
+!data/sample-match.json
+*.html
+!services/renderer/index.html
+.DS_Store

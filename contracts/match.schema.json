@@ -1,0 +1,136 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cs-poster/contracts/match.schema.json",
+  "title": "CS2 Series",
+  "description": "One CS2 series (Bo1/Bo3/Bo5). Scraper emits this; renderer consumes it. The only contract between the two services.",
+  "type": "object",
+  "required": ["event", "format", "teams", "seriesScore", "maps"],
+  "additionalProperties": false,
+  "properties": {
+    "event": { "type": "string", "description": "e.g. IEM Cologne 2025" },
+    "stage": { "type": "string", "description": "e.g. Grand Final" },
+    "date": { "type": "string", "description": "ISO date of the match" },
+    "sourceUrl": { "type": "string" },
+    "format": { "type": "string", "enum": ["bo1", "bo3", "bo5"] },
+    "teams": {
+      "type": "object",
+      "required": ["a", "b"],
+      "additionalProperties": false,
+      "properties": {
+        "a": { "$ref": "#/$defs/team" },
+        "b": { "$ref": "#/$defs/team" }
+      }
+    },
+    "seriesScore": {
+      "type": "object",
+      "required": ["a", "b"],
+      "additionalProperties": false,
+      "properties": {
+        "a": { "type": "integer", "minimum": 0 },
+        "b": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "maps": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/map" }
+    }
+  },
+  "$defs": {
+    "team": {
+      "type": "object",
+      "required": ["name", "color"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "color": { "type": "string", "description": "hex, hand-picked from flag/jersey", "pattern": "^#[0-9a-fA-F]{6}$" }
+      }
+    },
+    "map": {
+      "type": "object",
+      "required": ["name", "score", "winner", "rounds"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "description": "Mirage, Inferno, ..." },
+        "score": {
+          "type": "object",
+          "required": ["a", "b"],
+          "additionalProperties": false,
+          "properties": {
+            "a": { "type": "integer", "minimum": 0 },
+            "b": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "winner": { "type": "string", "enum": ["a", "b"] },
+        "overtime": { "type": "boolean", "default": false },
+        "decider": { "type": "boolean", "default": false, "description": "last map, decided the series" },
+        "rounds": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/round" }
+        },
+        "players": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/player" }
+        }
+      }
+    },
+    "round": {
+      "type": "object",
+      "required": ["n", "winner"],
+      "additionalProperties": false,
+      "properties": {
+        "n": { "type": "integer", "minimum": 1, "description": "round number, 1-based" },
+        "half": { "type": "integer", "minimum": 1, "description": "1, 2, then 3+ for OT halves" },
+        "winner": { "type": "string", "enum": ["a", "b"] },
+        "side": {
+          "type": "object",
+          "description": "which side each team played this round",
+          "additionalProperties": false,
+          "properties": {
+            "a": { "type": "string", "enum": ["CT", "T"] },
+            "b": { "type": "string", "enum": ["CT", "T"] }
+          }
+        },
+        "winType": {
+          "type": "string",
+          "enum": ["elimination", "bomb_detonate", "bomb_defuse", "time", "unknown"],
+          "default": "unknown"
+        },
+        "bombPlant": { "type": "boolean", "default": false },
+        "kills": { "type": "integer", "minimum": 0, "description": "total kills in the round (drives stroke count/density)" }
+      }
+    },
+    "player": {
+      "type": "object",
+      "required": ["team", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "team": { "type": "string", "enum": ["a", "b"] },
+        "name": { "type": "string" },
+        "kills": { "type": "integer", "minimum": 0 },
+        "deaths": { "type": "integer", "minimum": 0 },
+        "adr": { "type": "number", "minimum": 0, "description": "average damage per round, drives stroke length" },
+        "rating": { "type": "number" },
+        "clutches": {
+          "type": "array",
+          "description": "1vX rounds won, become gravity attractors",
+          "items": {
+            "type": "object",
+            "required": ["round", "vs"],
+            "additionalProperties": false,
+            "properties": {
+              "round": { "type": "integer", "minimum": 1 },
+              "vs": { "type": "integer", "minimum": 1, "description": "X in 1vX" }
+            }
+          }
+        },
+        "aces": {
+          "type": "array",
+          "description": "round numbers where this player got 5 kills",
+          "items": { "type": "integer", "minimum": 1 }
+        }
+      }
+    }
+  }
+}

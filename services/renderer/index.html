@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>cs-poster</title>
+    <style>
+      :root { color-scheme: dark; }
+      body {
+        margin: 0;
+        background: #0b0a0d;
+        color: #eee;
+        font: 14px/1.4 -apple-system, system-ui, sans-serif;
+      }
+      .toolbar {
+        position: sticky; top: 0; z-index: 10;
+        display: flex; gap: 16px; align-items: center;
+        padding: 12px 20px; background: #15131a; border-bottom: 1px solid #2a2730;
+      }
+      .toolbar button, .toolbar label {
+        background: #2a2730; color: #eee; border: 1px solid #3a3744;
+        padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 13px;
+      }
+      .stage { padding: 40px; display: flex; justify-content: center; }
+      #canvas-host {
+        position: relative; background: #111014;
+        box-shadow: 0 20px 80px rgba(0,0,0,0.6);
+      }
+      #canvas-host canvas { display: block; }
+      .overlay { position: absolute; pointer-events: none; }
+      .overlay.header { text-align: center; }
+      .overlay.header .event { letter-spacing: .18em; text-transform: uppercase; font-size: 13px; color: #9b96a8; }
+      .overlay.header .title { font-size: 46px; font-weight: 800; margin: 8px 0; letter-spacing: -.01em; }
+      .overlay.header .title .score { color: #fff; margin: 0 18px; font-variant-numeric: tabular-nums; }
+      .overlay.header .date { font-size: 12px; color: #6f6a7d; letter-spacing: .1em; }
+      .overlay.maplabel {
+        display: flex; align-items: baseline; gap: 12px;
+        font-size: 15px; letter-spacing: .14em; text-transform: uppercase; color: #c9c4d6;
+      }
+      .overlay.maplabel .mapname { font-weight: 700; }
+      .overlay.maplabel .mapscore { color: #fff; font-variant-numeric: tabular-nums; }
+      .overlay.maplabel .tag {
+        font-size: 10px; padding: 2px 6px; border: 1px solid #4a4658; border-radius: 4px; color: #9b96a8;
+      }
+      .overlay.maplabel .tag.dec { border-color: #ffd54a; color: #ffd54a; }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "p5": "https://esm.sh/p5@1.11.0",
+          "p5.brush": "https://esm.sh/p5.brush@1.1.0?deps=p5@1.11.0",
+          "html2canvas": "https://esm.sh/html2canvas@1.4.1"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div class="toolbar">
+      <strong>cs-poster</strong>
+      <label>load JSON<input id="file" type="file" accept="application/json" hidden /></label>
+      <button id="save">Save PNG</button>
+      <span style="color:#6f6a7d">default: data/sample-match.json · or append ?data=/data/your.json</span>
+    </div>
+    <div class="stage"><div id="canvas-host"></div></div>
+    <script type="module" src="/services/renderer/sketch.js"></script>
+  </body>
+</html>
