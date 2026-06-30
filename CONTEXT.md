@@ -33,9 +33,21 @@ Generative posters from CS2 match data, **one poster per series** (Bo3/Bo5). Eac
 - Length = pass-share analog → CS2 ADR / round impact. Density = possession analog → round-win share. Background = data written repeatedly as faint texture (not yet built).
 - Brush: **p5.brush** (Alejandro Campos Uribe), custom **spray** on **WebGL**.
 
-Implementation: `buildField()` returns `angleAt(x,y,baseDir)` = base dir + Σ attractors `pull*radial + swirl*(0.4+drama)*tangential`, falloff `(1-d/r)²`, + ambient curl. `trace()` walks the field into a ~25-pt polyline. `sketch.js`: `brush.set("spray",color,weight); brush.spline(points,0.5)` with native `curveVertex` fallback.
+Implementation: `buildField()` returns `angleAt(x,y,baseDir)` = base dir + Σ attractors `pull*radial + swirl*(0.4+drama)*tangential`, falloff `(1-d/r)²`, + ambient curl. `trace()` walks the field into a ~25-pt polyline **with per-point pressure** (`[x,y,pressure]`, tapered `sin(πt)`: thin ends, full middle — uniform width is what made it look like dead tubes). `sketch.js`: `brush.set(brushName, colorWithAlpha, weight); brush.spline(points, curvature)` with native `curveVertex` fallback.
 
-Tunable knobs: `layout.js` `DEFAULTS` → `swirl`, `pull`, `baseLen`, `strokesPerRound`, `slotW`, `ambient`, `step`, `bandH`, `bandGap`.
+### Why brush.spline, NOT brush.flowLine (decided after reading p5.brush source)
+
+p5.brush's field integration is `heading = field_angle − plotAngle` (`src/core/flowfield.js`) — the field **replaces** direction. One global field therefore can't give team A leftward AND team B rightward flow simultaneously. So `layout.js` owns the field (deterministic, testable, bidirectional) and emits polylines; `sketch.js` just paints them. Do not "fix" this by switching to native flowLine.
+
+### p5.brush real API (from source, for reference)
+`brush.instance(p)`, `brush.load()`, `brush.scaleBrushes(s)`, `brush.set(name,color,weight)`, `brush.pick(name)`, `brush.spline(points,curvature)` (points may be `[x,y,pressure]`), `brush.flowLine(x,y,len,dir)`, `brush.field(name)`/`brush.addField(name,(t,field)=>field,{angleMode})`, `brush.fill/bleed/hatch/...`. Built-in brushes: `spray, marker, marker2, 2B, HB, 2H, cpencil, pen, rotring, charcoal, hatch_brush`. Custom `brush.add(name,{type,scatter,grain,opacity,spacing,pressure,...})` — image type needs an asset (avoid, CSP).
+
+### Live parameter panel (Zeh's "interface to iterate")
+`index.html` has a left `#panel`; `sketch.js` `buildPanel()` makes sliders bound to `layout.js DEFAULTS` (`swirl, pull, ambient, baseLen, strokesPerRound, taper, slotW, bandH, step`) + render-only controls (`brush` select, `opacity`, `curvature`, `brushScale`, bg-texture toggle). Any change re-runs `computePoster` + repaints. This is how we converge on the look — tune live, then bake good values into DEFAULTS.
+
+Tunable knobs: `layout.js` `DEFAULTS` (exported) → `swirl`, `pull`, `baseLen`, `strokesPerRound`, `taper`, `slotW`, `ambient`, `step`, `bandH`, `bandGap`.
+
+Background data texture: faint repeated map scores + round W/L glyphs behind the canvas (`.bg-data`, z-index 0; canvas z-1; text overlay z-2 — explicit stacking fixes the old bug where the opaque canvas hid the header).
 
 ## Data-source reality (the recurring blocker)
 
@@ -52,8 +64,8 @@ Feed the `hltv` lib a Cloudflare clearance cookie via `HLTV.createInstance({ loa
 
 - 20 gate tests pass (`pnpm test`).
 - Real match scraped: `data/m2395002.json` = **FURIA 0–3 Falcons** (bo5, Mirage/Anubis/Inferno, all 8–13, 21 rounds each).
-- Renderer rewritten to the flow-field technique above. User: "better but still improvements to do" — iterating on the look.
-- View: `pnpm render` → <http://localhost:5173/?data=/data/m2395002.json> (hard-refresh after JS edits). Sample (denser, has real attractors): <http://localhost:5173/>.
+- Renderer rewritten to the flow-field technique above, then upgraded: per-point pressure taper, low-opacity layering, live tuning panel, switchable brushes, background data texture, fixed canvas/text stacking. 20 tests pass.
+- View: `pnpm render` → <http://localhost:5173/?data=/data/m2395002.json> (hard-refresh after JS edits). Sample (denser, has real attractors): <http://localhost:5173/>. Tune with the left panel; bake good slider values into `layout.js DEFAULTS`.
 
 ### Open / next
 

@@ -11,7 +11,7 @@
 //
 // sketch.js only paints the polylines this produces; it computes nothing.
 
-const DEFAULTS = {
+export const DEFAULTS = {
   width: 1280,
   margin: 90,
   headerH: 210,
@@ -23,7 +23,8 @@ const DEFAULTS = {
   step: 7, // integration step in px
   pull: 0.45, // radial component (toward attractor)
   swirl: 1.15, // tangential component (orbit) — the "gravity swirl"
-  ambient: 0.16 // ambient curl so far-from-event lines aren't dead straight
+  ambient: 0.16, // ambient curl so far-from-event lines aren't dead straight
+  taper: 0.45 // pressure at the stroke ends (1 = no taper); mid is always full
 };
 
 // seeded LCG -> deterministic "noise" (no Math.random, stays reproducible)
@@ -99,7 +100,7 @@ export function computePoster(series, opts = {}) {
   // integrate every stroke through the shared field -> curved polylines
   const field = buildField(attractors, drama, cfg);
   const strokes = strokeSeeds.map((s) => ({
-    points: trace(s.x, s.y, s.baseDir, s.len, field, cfg.step),
+    points: trace(s.x, s.y, s.baseDir, s.len, field, cfg.step, cfg.taper),
     color: s.color,
     weight: s.weight,
     team: s.team,
@@ -144,8 +145,11 @@ function buildField(attractors, drama, cfg) {
 }
 
 // Walk the field from a start point, accumulating arc length, until `len`.
-function trace(x0, y0, baseDir, len, field, step) {
-  const pts = [[x0, y0]];
+// Each point carries a pressure (3rd element) so the brush tapers: thin at the
+// ends, full through the middle. Uniform pressure is what made v2 look like
+// dead tubes; the taper is what reads as a real brush mark.
+function trace(x0, y0, baseDir, len, field, step, taper) {
+  const xy = [[x0, y0]];
   let x = x0, y = y0, acc = 0;
   let guard = 0;
   while (acc < len && guard++ < 400) {
@@ -153,9 +157,14 @@ function trace(x0, y0, baseDir, len, field, step) {
     x += Math.cos(a) * step;
     y += Math.sin(a) * step;
     acc += step;
-    pts.push([round2(x), round2(y)]);
+    xy.push([round2(x), round2(y)]);
   }
-  return pts;
+  const n = xy.length;
+  return xy.map(([px, py], i) => {
+    const t = n > 1 ? i / (n - 1) : 0; // 0..1 along the stroke
+    const pressure = taper + (1 - taper) * Math.sin(Math.PI * t); // ends->mid->ends
+    return [px, py, round2(pressure)];
+  });
 }
 
 const round2 = (v) => Math.round(v * 100) / 100;

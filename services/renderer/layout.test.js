@@ -24,12 +24,17 @@ test("band width is proportional to round count", () => {
   assert.equal(widest.name, "Nuke");
 });
 
-test("strokes are traced polylines (curved paths, not single segments)", () => {
+test("strokes are traced polylines with per-point pressure", () => {
   const { strokes } = computePoster(series);
   assert.ok(strokes.every((s) => Array.isArray(s.points) && s.points.length >= 2));
   // a traced flow line has many points, not just start+end
   const avgPts = strokes.reduce((n, s) => n + s.points.length, 0) / strokes.length;
   assert.ok(avgPts > 5, "flow lines should integrate into multiple points");
+  // each point is [x, y, pressure]; pressure tapers (ends low, middle full)
+  const s = strokes.find((x) => x.points.length > 6);
+  assert.ok(s.points.every((p) => p.length === 3 && p[2] > 0 && p[2] <= 1));
+  const mid = s.points[Math.floor(s.points.length / 2)][2];
+  assert.ok(mid > s.points[0][2], "middle pressure exceeds the tapered start");
 });
 
 test("team A flows left, team B flows right (net horizontal displacement)", () => {
