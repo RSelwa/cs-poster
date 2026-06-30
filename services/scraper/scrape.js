@@ -2,13 +2,15 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { parseSeries } from "./parse.js";
 import { assertValid } from "./validate.js";
 
-// Usage:
-//   node services/scraper/scrape.js --url  "https://www.hltv.org/matches/.../..." --out data/x.json
-//   node services/scraper/scrape.js --html ./saved-match-page.html               --out data/x.json
+// Usage (pick one source):
+//   node services/scraper/scrape.js --match 2306295                              --out data/x.json   (HLTV lib, preferred)
+//   node services/scraper/scrape.js --url  "https://www.hltv.org/matches/.../..." --out data/x.json   (cheerio, may hit Cloudflare)
+//   node services/scraper/scrape.js --html ./saved-match-page.html               --out data/x.json   (cheerio, offline)
 //   optional: --colorA "#hex" --colorB "#hex" --event "IEM Cologne 2025"
 //
-// HLTV sits behind Cloudflare; --url may return a 403 challenge page. When it
-// does, open the match page in a browser, "Save Page As" HTML, and use --html.
+// --match uses gigobyte/HLTV (getMatch + getMatchMapStats) for true round-by-round
+// data and player ADR. HLTV sits behind Cloudflare; if --match or --url is blocked,
+// open the match page in a browser, "Save Page As" HTML, and use --html.
 function args() {
   const a = process.argv.slice(2);
   const get = (flag) => {
@@ -16,6 +18,7 @@ function args() {
     return i >= 0 ? a[i + 1] : undefined;
   };
   return {
+    match: get("--match"),
     url: get("--url"),
     html: get("--html"),
     out: get("--out") || "data/match.json",
@@ -44,18 +47,21 @@ async function fetchHtml(url) {
 }
 
 async function main() {
-  const { url, html, out, colorA, colorB, event } = args();
-  if (!url && !html) {
-    console.error("need --url <hltv match url> or --html <saved page>");
+  const { match, url, html, out, colorA, colorB, event } = args();
+  if (!match && !url && !html) {
+    console.error("need --match <id>, --url <hltv match url>, or --html <saved page>");
     process.exit(1);
   }
 
-  const source = html ? readFileSync(html, "utf8") : await fetchHtml(url);
-  const series = parseSeries(source, {
-    sourceUrl: url || html,
-    event,
-    color: { a: colorA, b: colorB }
-  });
+  const colors = { a: colorA, b: colorB };
+  let series;
+  if (match) {
+    const { fetchSeries } = await import("./hltv-fetch.js");
+    series = await fetchSeries(match, { colors });
+  } else {
+    const source = html ? readFileSync(html, "utf8") : await fetchHtml(url);
+    series = parseSeries(source, { sourceUrl: url || html, event, color: colors });
+  }
 
   assertValid(series);
   writeFileSync(out, JSON.stringify(series, null, 2));

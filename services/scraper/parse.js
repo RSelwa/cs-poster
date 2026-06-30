@@ -45,10 +45,7 @@ export function parseSeries(html, { sourceUrl = "", event = "", color = {} } = {
     maps: []
   };
 
-  const mapHolders = $(".mapholder").toArray().filter((el) => {
-    // skip not-played maps (no score)
-    return $(el).find(".results-team-score").length >= 2;
-  });
+  const mapHolders = $(".mapholder").toArray();
 
   mapHolders.forEach((el, idx) => {
     const $m = $(el);
@@ -57,7 +54,9 @@ export function parseSeries(html, { sourceUrl = "", event = "", color = {} } = {
       .find(".results-team-score")
       .map((_, s) => parseInt($(s).text().trim(), 10))
       .get();
-    const [scoreA = 0, scoreB = 0] = scores;
+    const [scoreA, scoreB] = scores;
+    // skip maps not played / TBD: score cells absent or non-numeric ("-")
+    if (!Number.isInteger(scoreA) || !Number.isInteger(scoreB)) return;
     const winner = scoreA > scoreB ? "a" : "b";
     const overtime = scoreA > 12 + 1 && scoreB > 12 ? true : scoreA + scoreB > 24;
 

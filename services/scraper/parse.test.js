@@ -59,6 +59,22 @@ test("round history decodes winner and win type per round", () => {
   assert.equal(rounds[0].bombPlant, false);
 });
 
+test("maps with non-numeric score ('-') are dropped, output stays valid", () => {
+  // regression: a TBD/not-played map row has score "-"; parseInt -> NaN, which
+  // previously slipped past the `=0` default and produced `score.a must be integer`.
+  const withTbd = `
+    <div class="teamsBox"><div class="team"><div class="teamName">A</div></div>
+      <div class="team"><div class="teamName">B</div></div></div>
+    <div class="mapholder"><div class="mapname">Mirage</div>
+      <div class="results-team-score">13</div><div class="results-team-score">9</div></div>
+    <div class="mapholder"><div class="mapname">Nuke</div>
+      <div class="results-team-score">-</div><div class="results-team-score">-</div></div>`;
+  const s = parseSeries(withTbd);
+  assertValid(s); // must not throw
+  assert.equal(s.maps.length, 1);
+  assert.equal(s.maps[0].name, "Mirage");
+});
+
 test("sample-match.json is valid against the contract", () => {
   const sample = JSON.parse(
     readFileSync(new URL("../../data/sample-match.json", import.meta.url), "utf8")

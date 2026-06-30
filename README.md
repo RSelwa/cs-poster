@@ -41,13 +41,23 @@ The boundary between the two services is **`contracts/match.schema.json`**. The 
 ```bash
 npm install
 
-# scrape (live URL — may hit Cloudflare) or from a saved page
-node services/scraper/scrape.js --url "https://www.hltv.org/matches/.../..." --out data/final.json
-node services/scraper/scrape.js --html ./saved-match-page.html      --out data/final.json
+# preferred: gigobyte/HLTV lib by match id (true round-by-round + player ADR)
+node services/scraper/scrape.js --match 2306295 --colorA "#e4b343" --colorB "#3a6ea5" --out data/final.json
 
-# render: open the page, it loads the JSON, draws, click Save PNG
-open services/renderer/index.html
+# fallbacks (cheerio): live URL (may hit Cloudflare) or a saved page
+node services/scraper/scrape.js --url  "https://www.hltv.org/matches/.../..." --out data/final.json
+node services/scraper/scrape.js --html ./saved-match-page.html               --out data/final.json
+
+# render: serve the repo, open the page, it loads the JSON, click Save PNG
+npm run render        # http://localhost:5173  (append ?data=/data/final.json)
 ```
+
+### Data sources
+
+- **`--match <id>`** (preferred): [gigobyte/HLTV](https://github.com/gigobyte/HLTV) — `getMatch` for the skeleton + `getMatchMapStats` per map for round-by-round outcomes and player ADR/rating. Throttled to minimize Cloudflare risk.
+- **`--url` / `--html`** (fallback): cheerio parse of the match page. `--html` works offline from a saved page.
+
+**Known data gaps:** the HLTV lib exposes no per-round kill counts (layout defaults to 5/round) and no clutch/ace counts. So clutch/ace attractors only appear from the cheerio path or hand-edited JSON; otherwise attractors fall back to bomb-plant rounds.
 
 ## Tests
 
