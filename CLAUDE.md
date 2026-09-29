@@ -4,13 +4,15 @@ Generative CS2 match posters from HLTV data. One poster per match: every map's r
 end to end on one 3:4 canvas, painted as brush strokes (no markers, no icons).
 
 Personal side project. **Not `flim-monorepo`**: the flim rules in `~/.claude/rules/` (Firebase,
-Next, oxlint, vitest, `develop` branch, gitmoji) do not apply here. Not a git repo.
+Next, oxlint, vitest, `develop` branch, gitmoji) do not apply here. Git repo, branch `main`, no remote.
+`.gitignore` keeps `.browser-profile/`, `.cache/`, `posters/`, `.watch-state.json` out.
 
 ## Run
 
 ```sh
-pnpm install     # README says npm; a pnpm-lock.yaml is what's actually present
+pnpm install
 pnpm start       # node server.mjs → http://localhost:4173 (PORT env overrides)
+pnpm watch       # node watch.mjs → a poster per finished tier 1 match, no UI
 ```
 
 - The server launches a **headed** Chrome (`channel: 'chrome'`, falls back to Playwright's
@@ -26,14 +28,19 @@ ESM in Node (`"type": "module"`). Only dependency: `playwright`.
 
 | file | role |
 | ---- | ---- |
-| `core.js` | everything that isn't UI or network: HLTV parser, match assembly, drama score, key rounds, noise/RNG, Canvas 2D renderer. IIFE exporting `HLTVPoster` on `window`, or `module.exports` in Node |
+| `core.js` | everything that isn't UI or network: HLTV parser, match assembly, drama score, key rounds, noise/RNG, Canvas 2D renderer. IIFE exporting `HLTVPoster` on `window`. The package is `"type": "module"`, so in Node `import("./core.js")` sets `globalThis.HLTVPoster` (`module.exports` is never hit) |
 | `index.html` | the whole UI: inline CSS + inline script. Left panel = data, center = poster, right panel = sliders |
 | `server.mjs` | static server for `index.html` / `core.js` + `/api/html?url=…` proxy through Playwright |
+| `bo3.mjs` | bo3.gg JSON API (`api.bo3.gg/api/v1`, undocumented, no Cloudflare, plain `fetch`, ≥ 1 s apart) → maps in the project JSON format. All bo3.gg field names live here. Real per-round per-team kills (`game_round_team_clans[].kills`) go into `round.kills` as `{team}` without `t` |
+| `render.mjs` | headless Chromium loads `core.js` + Google Fonts, runs `buildMatch` + `renderPoster` with `DEFAULTS` + `defaultColors`, returns a PNG buffer |
+| `watch.mjs` | polls bo3.gg finished matches (`--tiers s`, `--interval 120`, `--lookback 12` h), renders each once all its demos are parsed (~10–20 min after the end), writes `posters/<date>_<slug>.png` + `.json`, records done ids in `.watch-state.json`. `--match <slug>` renders one, `--once` one pass |
 | `fixtures/` | fake tier-1 matches as import JSON (`source: "fake"`, events suffixed "(fictif)"). Real team/player names, invented scores and stats. `node fixtures/generate.mjs` regenerates them deterministically; scenarios are declared in its `MATCHES`. It also writes `fixtures/fixtures.js` (`window.HLTV_FIXTURES`), loaded by a `<script>` tag so the "Matchs de test" select works from `file://` too — regenerate after editing `MATCHES` |
 | `.cache/` | fetched HTML, keyed by `sha1(url)`. Only pages > 5000 chars are cached (skips Cloudflare stubs) |
 | `.browser-profile/` | Chrome profile with HLTV / Cloudflare cookies. **Sensitive — never share, commit, or read into context** |
 
 ## Data flow
+
+Two sources. **bo3.gg** (automatic, `watch.mjs`): `bo3.mjs` → `render.mjs`, no browser window. **HLTV** (manual, UI):
 
 1. **Fetch** — UI posts a URL to `/api/html`. Allowed: `hltv.org/matches/…` and
    `hltv.org/stats/matches/…` only (`ALLOWED` regex). Requests are serialized, ≥ 2 s apart
@@ -128,5 +135,4 @@ a real Chrome window and hits HLTV.
 <!-- fill in together -->
 - Goal of the project (print? social posts? gallery?)
 - Should HLTV parsing get fixture-based tests (saved HTML in `.cache/`)?
-- Real kill timings from demo files instead of estimates?
-- `npm` vs `pnpm` — pick one and update README
+- Real kill timings within a round (bo3.gg gives per-round counts, not timestamps)?

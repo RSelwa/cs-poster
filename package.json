@@ -4,6 +4,6 @@
   "private": true,
   "type": "module",
   "description": "Affiches génératives de matchs CS2 à partir des données HLTV",
-  "scripts": { "start": "node server.mjs" },
+  "scripts": { "start": "node server.mjs", "watch": "node watch.mjs" },
   "dependencies": { "playwright": "^1.49.0" }
 }

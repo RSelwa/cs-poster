@@ -205,17 +205,12 @@
 <script src="fixtures/fixtures.js"></script>
 <script>
 (() => {
-  const { parseMapStats, parseMatchPageLinks, demoMatch, buildMatch, computeDrama, keyRounds, renderPoster, DEFAULTS } = HLTVPoster;
+  const { parseMapStats, parseMatchPageLinks, demoMatch, buildMatch, computeDrama, keyRounds, renderPoster, DEFAULTS, defaultColors } = HLTVPoster;
   const FONTS = { serif: "'Instrument Serif', Georgia, serif", sans: "'Familjen Grotesk', system-ui, sans-serif", mono: "'DM Mono', ui-monospace, monospace" };
   const $ = (id) => document.getElementById(id);
 
   const params = JSON.parse(JSON.stringify(DEFAULTS));
   let matches = [], current = -1, hasServer = false; // matches[i] = { key, maps: [données brutes], built }
-
-  /* ---------- palette par défaut, stable pour un nom d'équipe ---------- */
-  const PAIRS = [['#e2452b', '#1f5fa8'], ['#e0891a', '#127a8a'], ['#d6337a', '#2f8f6b'], ['#e3b400', '#5b3fa8'], ['#c8321f', '#1a8fb0'], ['#7a9a1a', '#b03a7a']];
-  const hash = (s) => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
-  const defaultColors = (names) => PAIRS[hash(names.join('|')) % PAIRS.length].slice();
 
   /* ---------- contrôles générés ---------- */
   const SLIDERS = [

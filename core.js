@@ -255,6 +255,11 @@
     showGrid: false, showBgData: true, showText: true,
   };
 
+  // palette par défaut, stable pour un nom d'équipe (même couleurs dans l'interface et dans le rendu headless)
+  const PAIRS = [['#e2452b', '#1f5fa8'], ['#e0891a', '#127a8a'], ['#d6337a', '#2f8f6b'], ['#e3b400', '#5b3fa8'], ['#c8321f', '#1a8fb0'], ['#7a9a1a', '#b03a7a']];
+  const hash = (s) => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+  const defaultColors = (names) => PAIRS[hash(names.join('|')) % PAIRS.length].slice();
+
   const GRAVITY_MIN_MASS = 1;
 
   const THEMES = {
@@ -569,13 +574,13 @@
       ctx.textAlign = 'right'; ctx.fillStyle = tc[1]; ctx.fillText(data.teams[1].name, W - mx, yBase - W * 0.008);
       ctx.fillStyle = T.ink; ctx.globalAlpha = 0.55; ctx.font = `${small * 0.8}px ${F.mono}`; ctx.textAlign = 'left';
       const ref = data.matchId ? `match ${data.matchId}` : `map ${data.mapInfo.map((m) => m.mapStatsId ?? '—').join('/')}`;
-      ctx.fillText(`hltv ${ref}  ·  seed ${P.seed}  ·  drame ${drama.toFixed(2)}`, mx, H - H * 0.018);
+      ctx.fillText(`${data.source === 'bo3' ? 'bo3.gg' : 'hltv'} ${ref}  ·  seed ${P.seed}  ·  drame ${drama.toFixed(2)}`, mx, H - H * 0.018);
       ctx.globalAlpha = 1;
     }
 
     return { drama, keys, rows, events: events.length };
   }
 
-  const api = { parseMapStats, parseMatchPageLinks, demoMatch, buildMatch, computeDrama, keyRounds, renderPoster, DEFAULTS, THEMES, teamTotals };
+  const api = { parseMapStats, parseMatchPageLinks, demoMatch, buildMatch, computeDrama, keyRounds, renderPoster, DEFAULTS, THEMES, teamTotals, defaultColors };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.HLTVPoster = api;
 })(typeof window !== 'undefined' ? window : globalThis);
