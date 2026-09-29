@@ -1,6 +1,4 @@
 node_modules/
-.browser-profile/
-.cache/
-posters/
-.watch-state.json
+dist/
+data/
 .DS_Store

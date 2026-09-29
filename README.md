@@ -1,69 +1,68 @@
-# Affiches CS2 depuis HLTV
+# Affiches CS2
 
-Une affiche par match : toutes les maps sont mises bout à bout sur la même toile. Uniquement des traits, aucun marqueur.
+Une affiche par match : toutes les maps sont mises bout à bout sur la même toile. Uniquement des traits,
+aucun marqueur. Un serveur surveille les matchs tier 1 et rend l'affiche quelques minutes après la fin ;
+un éditeur permet de la retoucher.
 
 ## Lancer
 
     pnpm install
-    pnpm start        # puis ouvrir http://localhost:4173
+    pnpm dev         # éditeur sur http://localhost:5173, serveur (API + watcher) sur :4173
 
-Le serveur ouvre un vrai Chrome pour récupérer les pages HLTV (Cloudflare bloque les requêtes
-classiques). Si un captcha apparaît, résous-le une fois : le cookie est conservé dans .browser-profile/.
-Si Chrome n'est pas installé : npx playwright install chromium
+En production :
 
-Les pages téléchargées sont mises en cache dans .cache/ (une page n'est demandée qu'une fois) et
-les requêtes sont espacées de 2 s.
+    pnpm build
+    pnpm start       # un seul serveur sur http://localhost:4173
+
+Le rendu automatique utilise Chrome sans fenêtre. Si Chrome n'est pas installé :
+`npx playwright install chromium`.
 
 ## Poster automatique après chaque match tier 1
 
-    pnpm watch                                   # boucle, toutes les 2 min
-    node watch.mjs --once                        # un seul passage
-    node watch.mjs --match vitality-vs-furia-20-09-2026   # un match précis (slug bo3.gg)
+Le serveur interroge bo3.gg toutes les 2 min. Un match est rendu dès que bo3.gg a traité toutes ses
+démos, en général 10 à 20 min après la fin ; sinon il est retenté au passage suivant. Les posters sont
+dans `data/posters/`, et un badge « poster » apparaît à côté du match dans l'éditeur.
 
-Options : --tiers s (lettres bo3.gg, ex. s,a), --size 2400 (largeur en px), --interval 120 (s),
---lookback 12 (heures).
+Variables d'environnement :
 
-Les données viennent de l'API JSON de bo3.gg (bo3.mjs) : pas de Cloudflare, donc pas de fenêtre Chrome.
-Elle donne les kills réels de chaque round (plus d'estimation). Un match est rendu dès que bo3.gg a
-parsé toutes ses démos, en général 10 à 20 min après la fin ; sinon il est retenté au passage suivant.
-Le rendu se fait dans un Chromium headless (render.mjs), avec le même moteur et les mêmes réglages par
-défaut que l'interface.
+| variable | défaut | rôle |
+| --- | --- | --- |
+| `PORT` | 4173 | port du serveur |
+| `TIERS` | `s` | tiers bo3.gg surveillés (`s` = tier 1, ex. `s,a`) |
+| `WATCH` | `1` | `0` coupe le watcher |
+| `WATCH_INTERVAL_S` | 120 | secondes entre deux passages |
+| `WATCH_LOOKBACK_H` | 12 | ne rend que les matchs finis depuis moins de N heures |
+| `POSTER_SIZE` | 2400 | largeur des posters en px |
 
-Sortie : posters/<date>_<slug>.png et .json (à déposer dans l'interface pour retoucher les réglages).
-Les matchs déjà rendus sont notés dans .watch-state.json.
+Les données viennent de l'API JSON de bo3.gg : pas de Cloudflare, donc pas de navigateur pour les
+récupérer. Elle donne les kills réels de chaque round. Attention : cette API n'est ni documentée ni
+officielle, elle peut changer sans prévenir (tout le code qui la lit est dans `server/bo3.ts`).
 
-Attention : l'API de bo3.gg n'est ni documentée ni officielle, elle peut changer sans prévenir.
+## Éditeur
 
-## Sans serveur
+- À gauche : les matchs tier 1 récents (un clic charge le match), l'import d'un JSON, la démo, les
+  matchs de test fictifs, et le détail du match affiché.
+- Au centre : l'affiche.
+- À droite : couleurs, fond, curseurs, graine, export PNG (jusqu'à 3540 × 4720 px, 30 × 40 cm à 300 dpi).
 
-index.html s'ouvre aussi directement (double-clic). Dans ce mode, enregistre la page HLTV (Ctrl+S)
-et dépose les fichiers (plusieurs à la fois) dans l'interface, ou dépose un .json.
+## Organisation
 
-## Liens acceptés
+- `src/core/` : moteur du poster (assemblage du match, drame, rounds clés, rendu Canvas 2D), partagé
+  par l'éditeur et le serveur
+- `src/` : éditeur React (Vite, TypeScript, Tailwind, shadcn)
+- `server/` : API (Hono), récupération bo3.gg, watcher, rendu headless, stockage (`store.ts`, à
+  remplacer par une base de données)
+- `fixtures/` : matchs fictifs, régénérés par `pnpm fixtures`
 
-- Un match : https://www.hltv.org/matches/<id>/<slug> (toutes les maps sont récupérées et fusionnées)
-- Une map : https://www.hltv.org/stats/matches/mapstatsid/<id>/<slug> (rejoint son match si les autres maps sont déjà chargées)
+## Vérifier
 
-Les maps sont regroupées par match automatiquement (identifiant du match HLTV, sinon mêmes équipes + même événement).
-Si l'ordre des équipes est inversé d'une map à l'autre, il est remis d'aplomb.
-
-## Fichiers
-
-- core.js : parseur HLTV, calcul du drame, rounds clés, moteur de rendu (Canvas 2D, sans dépendance)
-- index.html : interface
-- server.mjs : récupération des pages HLTV via Playwright + cache
-- bo3.mjs : API bo3.gg → maps au format JSON ci-dessous
-- render.mjs : rendu PNG headless
-- watch.mjs : surveillance des matchs terminés
-
-## Si le parseur ne trouve plus rien
-
-HLTV modifie son HTML de temps en temps. Les sélecteurs sont regroupés dans parseMapStats() (core.js) :
-.round-history-team-row, .round-history-outcome, .team-left / .team-right, .stats-table.totalstats, .st-*
+    pnpm typecheck
+    pnpm lint
 
 ## Format JSON
 
-Export = `{ "version": 2, "maps": [ …une entrée par map… ] }`. L'import accepte aussi une map seule ou un tableau de maps.
+Export = `{ "version": 2, "maps": [ …une entrée par map… ] }`. L'import accepte aussi une map seule ou
+un tableau de maps.
 
     {
       "map": "Mirage", "event": "…", "date": 1780000000000, "mapStatsId": 123, "matchId": 456,
@@ -73,5 +72,6 @@ Export = `{ "version": 2, "maps": [ …une entrée par map… ] }`. L'import acc
       "players": [[{"name": "x", "kills": 20, "adr": 80.1}], [ … ]]
     }
 
-"kills" est optionnel (heure relative dans le round, 0 à 1). Sans lui, la répartition des kills dans
-les rounds est estimée à partir des totaux, car HLTV ne publie pas l'heure des kills.
+`kills` est optionnel. `t` est l'heure relative du kill dans le round (0 à 1) ; sans `t`, elle est tirée
+au hasard (même graine, même tirage). Sans `kills`, la répartition des kills dans les rounds est estimée
+à partir des totaux des joueurs.

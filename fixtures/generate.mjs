@@ -176,13 +176,9 @@ function labelFor(match, maps) {
   return `${a} ${score[0]}–${score[1]} ${b} · ${match.event.replace(' (fictif)', '')}`;
 }
 
-// fixtures.js : tous les matchs dans une balise <script>, lisible aussi quand index.html est ouvert en file://
-const bundle = [];
 for (const match of MATCHES) {
   const rnd = mulberry32(match.seed);
   const maps = match.maps.map((spec, i) => buildMap(match, spec, i, rnd));
-  await fs.writeFile(path.join(OUT_DIR, match.file), JSON.stringify({ version: 2, maps }, null, 2) + '\n');
-  bundle.push({ file: match.file, label: labelFor(match, maps), maps });
+  await fs.writeFile(path.join(OUT_DIR, match.file), JSON.stringify({ version: 2, label: labelFor(match, maps), maps }, null, 2) + '\n');
   console.log(`${match.file} : ${maps.map((m) => `${m.map} ${m.teams[0].name} ${m.teams[0].score}-${m.teams[1].score} ${m.teams[1].name}`).join(' · ')}`);
 }
-await fs.writeFile(path.join(OUT_DIR, 'fixtures.js'), `// Généré par fixtures/generate.mjs — ne pas modifier à la main.\nwindow.HLTV_FIXTURES = ${JSON.stringify(bundle)};\n`);

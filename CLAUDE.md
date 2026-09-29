@@ -1,66 +1,67 @@
-# CLAUDE.md — hltv-posters
+# CLAUDE.md — cs2-posters
 
-Generative CS2 match posters from HLTV data. One poster per match: every map's rounds laid
-end to end on one 3:4 canvas, painted as brush strokes (no markers, no icons).
+Generative CS2 match posters from bo3.gg data. One poster per match: every map's rounds laid
+end to end on one 3:4 canvas, painted as brush strokes (no markers, no icons). A server watches
+tier 1 matches and renders each poster a few minutes after the match ends; a React editor tunes
+them by hand.
 
 Personal side project. **Not `flim-monorepo`**: the flim rules in `~/.claude/rules/` (Firebase,
-Next, oxlint, vitest, `develop` branch, gitmoji) do not apply here. Git repo, branch `main`, no remote.
-`.gitignore` keeps `.browser-profile/`, `.cache/`, `posters/`, `.watch-state.json` out.
+Next, vitest, `develop` branch, gitmoji) do not apply here. Git repo, branch `main`, no remote.
+A database is planned: everything persistent goes through `server/store.ts`.
 
 ## Run
 
 ```sh
 pnpm install
-pnpm start       # node server.mjs → http://localhost:4173 (PORT env overrides)
-pnpm watch       # node watch.mjs → a poster per finished tier 1 match, no UI
+pnpm dev         # server (API + watcher, node --watch) on :4173 + Vite editor on :5173 (proxies /api, /posters)
+pnpm build       # tsc -b + vite build → dist/
+pnpm start       # production: one server on :4173 serves dist/, the API, posters, and runs the watcher
 ```
 
-- The server launches a **headed** Chrome (`channel: 'chrome'`, falls back to Playwright's
-  Chromium) on a persistent profile in `.browser-profile/`, because HLTV sits behind Cloudflare
-  and a plain `fetch` gets 403. A captcha is solved by hand once; the cookie persists.
-- `index.html` also works opened from disk (`file://`): no server, the user drops saved HLTV
-  pages (`.html`, several at once) or a `.json` export.
+Server env: `PORT` (4173, also read by `vite.config.ts` for the proxy), `TIERS` (`s`), `WATCH`
+(`0` disables the watcher), `WATCH_INTERVAL_S` (120), `WATCH_LOOKBACK_H` (12), `POSTER_SIZE` (2400).
 
-No build step, no bundler, no tests, no linter, no TypeScript. Plain ES2020+ in the browser,
-ESM in Node (`"type": "module"`). Only dependency: `playwright`.
+Stack: Vite 8 + React 19 + TypeScript 6 (strict) + Tailwind 4 + shadcn (`radix-nova`, Radix,
+lucide). Server: Hono on `@hono/node-server`, run by **Node's native type stripping** (Node ≥ 23,
+no tsx, no build): server code must stay erasable TS (`erasableSyntaxOnly`: no enums, no
+parameter properties) and relative imports carry the `.ts` extension. Headless rendering needs
+Chrome or `npx playwright install chromium`.
 
 ## Files
 
-| file | role |
+| path | role |
 | ---- | ---- |
-| `core.js` | everything that isn't UI or network: HLTV parser, match assembly, drama score, key rounds, noise/RNG, Canvas 2D renderer. IIFE exporting `HLTVPoster` on `window`. The package is `"type": "module"`, so in Node `import("./core.js")` sets `globalThis.HLTVPoster` (`module.exports` is never hit) |
-| `index.html` | the whole UI: inline CSS + inline script. Left panel = data, center = poster, right panel = sliders |
-| `server.mjs` | static server for `index.html` / `core.js` + `/api/html?url=…` proxy through Playwright |
-| `bo3.mjs` | bo3.gg JSON API (`api.bo3.gg/api/v1`, undocumented, no Cloudflare, plain `fetch`, ≥ 1 s apart) → maps in the project JSON format. All bo3.gg field names live here. Real per-round per-team kills (`game_round_team_clans[].kills`) go into `round.kills` as `{team}` without `t` |
-| `render.mjs` | headless Chromium loads `core.js` + Google Fonts, runs `buildMatch` + `renderPoster` with `DEFAULTS` + `defaultColors`, returns a PNG buffer |
-| `watch.mjs` | polls bo3.gg finished matches (`--tiers s`, `--interval 120`, `--lookback 12` h), renders each once all its demos are parsed (~10–20 min after the end), writes `posters/<date>_<slug>.png` + `.json`, records done ids in `.watch-state.json`. `--match <slug>` renders one, `--once` one pass |
-| `fixtures/` | fake tier-1 matches as import JSON (`source: "fake"`, events suffixed "(fictif)"). Real team/player names, invented scores and stats. `node fixtures/generate.mjs` regenerates them deterministically; scenarios are declared in its `MATCHES`. It also writes `fixtures/fixtures.js` (`window.HLTV_FIXTURES`), loaded by a `<script>` tag so the "Matchs de test" select works from `file://` too — regenerate after editing `MATCHES` |
-| `.cache/` | fetched HTML, keyed by `sha1(url)`. Only pages > 5000 chars are cached (skips Cloudflare stubs) |
-| `.browser-profile/` | Chrome profile with HLTV / Cloudflare cookies. **Sensitive — never share, commit, or read into context** |
+| `src/core/` | the poster engine, pure TS, no DOM beyond the canvas it is handed, **shared by the editor and the server**. `types.ts` (JSON map format + assembled `Match`), `match.ts` (`buildMatch`, `teamTotals`, `computeDrama`, `keyRounds`), `render.ts` (`renderPoster`, `DEFAULTS`, `THEMES`, `defaultColors`), `noise.ts` (RNG), `demo.ts`, `fonts.ts`, `index.ts` (entry bundled for the headless page). Imports inside use relative `.ts` paths, never `@/`, so Node can load `fonts.ts` / types from here |
+| `src/app.tsx` | editor state (loaded matches, current match, params, status) and the 3-column layout |
+| `src/components/` | editor panels: `bo3-matches` (tier 1 list from the API), `import-zone`, `fixture-picker`, `loaded-matches` (+ `round-strip`), `poster-canvas` (480 px then 1000 px preview), `controls-panel` (`SLIDERS` / `TOGGLES` / export), `param-slider`, `how-to-read` |
+| `src/components/ui/` | shadcn-generated (`pnpm dlx shadcn@latest add …`). Leave as generated |
+| `src/lib/` | `api.ts` + `api-types.ts` (API contract, types also imported by the server), `loaded-matches.ts` (grouping maps into matches, JSON import), `fixtures.ts` (`import.meta.glob` of `fixtures/*.json`), `download.ts`, `utils.ts` (shadcn `cn`) |
+| `server/index.ts` | Hono app: `GET /api/matches` (recent finished matches + poster url), `GET /api/matches/:slug` (maps, or `{ ready: false, reason }`), `/posters/*`, `dist/` in production; starts the watcher |
+| `server/bo3.ts` | bo3.gg JSON API (`api.bo3.gg/api/v1`, undocumented, no Cloudflare, plain `fetch`, ≥ 1 s apart) → maps in the project format. **All bo3.gg field names live here.** Per-round per-team kills (`game_round_team_clans[].kills`) go into `round.kills` as `{team}` without `t`. A game is ready when `state === 'done'`, all `rounds_count` rounds are there and 10 player stats |
+| `server/matches.ts` | recent list (60 s memory cache, merged with the poster index) and `loadMatch` (disk cache first) |
+| `server/watcher.ts` | every interval: finished matches of `TIERS` ended within the lookback and without a poster → render once ready (~10–20 min after the end, demos parsed), else retry next pass |
+| `server/render.ts` | bundles `src/core/index.ts` once with Vite's `build()` (IIFE, `window.PosterCore`, `write: false`), headless Chromium draws it with Google Fonts, `DEFAULTS` + `defaultColors` → PNG buffer |
+| `server/store.ts` | **the persistence boundary**, today files in `data/` (gitignored): `data/matches/<slug>.json` (maps of a fully parsed match, immutable), `data/posters/<slug>.png`, `data/posters.json` (index by bo3 match id). Swap this module for the DB |
+| `fixtures/` | fake tier-1 matches as import JSON (`{ version: 2, label, maps }`, `source: "fake"`, events suffixed "(fictif)"). `pnpm fixtures` regenerates them deterministically; scenarios are in `generate.mjs` → `MATCHES` |
 
 ## Data flow
 
-Two sources. **bo3.gg** (automatic, `watch.mjs`): `bo3.mjs` → `render.mjs`, no browser window. **HLTV** (manual, UI):
-
-1. **Fetch** — UI posts a URL to `/api/html`. Allowed: `hltv.org/matches/…` and
-   `hltv.org/stats/matches/…` only (`ALLOWED` regex). Requests are serialized, ≥ 2 s apart
-   (`MIN_DELAY_MS`), Cloudflare challenge polled up to 120 s.
-2. **Parse** — a match page → `parseMatchPageLinks()` → each `mapstatsid` page →
-   `parseMapStats()`. All HLTV selectors live in `parseMapStats()` (from the open-source
-   `gigobyte/HLTV` lib). When HLTV changes its HTML, this is the only place to fix.
-3. **Group** — UI groups maps into matches by `matchId`, else by sorted team names + event
-   (`groupKey`). Re-adding a `mapStatsId` replaces it.
+1. **List** — `listFinished` (tier filter `filter[matches.tier][in]=s`) → `/api/matches` → editor list.
+2. **Fetch** — `fetchMatch(slug)`: match → each finished game → `/games/{id}` (rounds) +
+   `/games/{id}/players_stats`. Not ready → reason string, retried later. Ready → cached forever.
+3. **Group** — the editor groups maps into matches by `matchId`, else by sorted team names +
+   event (`groupKey`). Re-adding a `mapStatsId` replaces it.
 4. **Build** — `buildMatch()` sorts maps by date, re-aligns team order to map 1 (swaps rounds,
    scores, kills, players, halves), concatenates rounds, computes `mapInfo`, series score.
-5. **Render** — `renderPoster(ctx, W, H, match, params, fonts)`.
+5. **Render** — `renderPoster(ctx, W, H, match, params, fonts)`, in the editor or headless.
 
 ## Renderer model (`renderPoster`)
 
 - A `cols × rows` grid maps chronological time: slot 0 = first round of map 1, last slot = last
   round of last map.
-- Each **kill** is an event → spawns strokes. HLTV has no kill timestamps, so
-  `estimateMapKills()` spreads each team's total kills over rounds (winners get more). If a round
-  carries `kills: [{team, t}]` in JSON, that's used as-is.
+- Each **kill** is an event → spawns strokes. If rounds carry `kills: [{team, t?}]` (bo3.gg data
+  does, without `t`), they are used as-is and a missing `t` is drawn from `rnd`. Otherwise
+  `estimateMapKills()` spreads each team's total kills over rounds (winners get more).
 - Each stroke is a **straight horizontal line** starting at its kill: team 0 runs left, team 1
   right (as in the GenCup method, zehfernandes.com/posts/how-i-turned-world-cup-data-into-posters).
   **Stroke length** ∝ team ADR share, **density** ∝ share of rounds won.
@@ -106,33 +107,42 @@ Two sources. **bo3.gg** (automatic, `watch.mjs`): `bo3.mjs` → `render.mjs`, no
 - Determinism: same `seed` + same data → same poster. Two RNG streams: `rnd` drives geometry,
   `rp` drives the grain only. Don't cross them, or tweaking the grain will move strokes.
 - Themes: `paper` (multiply) / `ink` (screen, team colors lifted).
-- Parameters: `DEFAULTS` in `core.js`. UI sliders are declared in `SLIDERS` / `TOGGLES` in
-  `index.html` — a new param needs both.
+- Parameters: `PosterParams` + `DEFAULTS` in `src/core/render.ts`. Editor sliders are declared in
+  `SLIDERS` / `TOGGLES` in `src/components/controls-panel.tsx` — a new param needs both.
+- The TS port of the old `core.js` was checked pixel-identical on all fixtures, both themes. Any
+  change to `render.ts` / `match.ts` / `noise.ts` changes every poster: say so.
 
 ## JSON format
 
-Export: `{ "version": 2, "maps": [ …one per map… ] }`. Import also accepts a bare map or an
-array. Minimal map shape is in `README.md`; `rounds` and `teams` are required.
+Export: `{ "version": 2, "maps": [ …one per map… ] }` (`MatchExport` in `src/core/types.ts`).
+Import also accepts a bare map or an array; `rounds` and `teams` are required.
 
 ## Conventions (as found)
 
 - UI copy, comments, error messages and README are **French**. Keep new UI strings in French.
-- Dense one-liner style, 2-space indent, semicolons, single quotes in JS. `function`
-  declarations and arrow consts both used. Match the surrounding file.
-- `core.js` stays dependency-free and DOM-optional (`docFactory` param lets Node pass a jsdom
-  parser).
-- Preview render at 480 px then 1000 px (debounced 260 ms); export sizes up to 3540 × 4720
-  (30 × 40 cm @ 300 dpi).
+- Own code: dense one-liner style, 2-space indent, semicolons, single quotes, `.ts` extensions on
+  relative imports. Components are arrow consts, kebab-case filenames. shadcn files keep their
+  generated style (double quotes, no semicolons).
+- Styling: Tailwind utilities on shadcn tokens (`src/index.css`: grey-green ground, light panels,
+  ink `#1c2420`, `--paper` for the sheet). Fonts: Familjen Grotesk (sans), Instrument Serif,
+  DM Mono — the same three the poster uses.
+- Preview render at 480 px then 1000 px (debounced 260 ms); editor export up to 3540 × 4720
+  (30 × 40 cm @ 300 dpi); watcher posters at `POSTER_SIZE`.
 
 ## Checking a change
 
-No automated checks. `node --check core.js server.mjs` for syntax. Rendering is verified by
-opening the page (demo match loads automatically) — ask before launching the server, it opens
-a real Chrome window and hits HLTV.
+```sh
+pnpm typecheck   # tsc -b: app, vite config, server
+pnpm lint        # oxlint (3 warnings in shadcn-generated ui/ files are expected)
+```
+
+No test suite yet. `pnpm dev` is safe to run: headless only, it calls bo3.gg (≥ 1 s between
+requests), no HLTV, no visible window. `WATCH=0` when you don't want posters rendered.
 
 ## Open questions / to improve
 
 <!-- fill in together -->
 - Goal of the project (print? social posts? gallery?)
-- Should HLTV parsing get fixture-based tests (saved HTML in `.cache/`)?
+- Which database, and what moves into it first (posters index, match cache, per-match params)?
 - Real kill timings within a round (bo3.gg gives per-round counts, not timestamps)?
+- bo3.gg is unofficial: fall back to GRID Open Access if it breaks?
