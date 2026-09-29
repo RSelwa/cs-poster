@@ -1,0 +1,1102 @@
+{
+  "version": 2,
+  "maps": [
+    {
+      "version": 1,
+      "source": "fake",
+      "mapStatsId": 99000501,
+      "matchId": 990005,
+      "event": "IEM Dallas 2026 — Phase de groupes (fictif)",
+      "date": 1779476400000,
+      "map": "Dust2",
+      "teams": [
+        {
+          "name": "G2",
+          "score": 8,
+          "startSide": "CT"
+        },
+        {
+          "name": "Aurora",
+          "score": 13,
+          "startSide": "T"
+        }
+      ],
+      "halves": [
+        [
+          4,
+          8
+        ],
+        [
+          4,
+          5
+        ]
+      ],
+      "rounds": [
+        {
+          "n": 1,
+          "winner": 0,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            1,
+            0
+          ]
+        },
+        {
+          "n": 2,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            1,
+            1
+          ]
+        },
+        {
+          "n": 3,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            1,
+            2
+          ]
+        },
+        {
+          "n": 4,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            2,
+            2
+          ]
+        },
+        {
+          "n": 5,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            2,
+            3
+          ]
+        },
+        {
+          "n": 6,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            2,
+            4
+          ]
+        },
+        {
+          "n": 7,
+          "winner": 1,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            2,
+            5
+          ]
+        },
+        {
+          "n": 8,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            2,
+            6
+          ]
+        },
+        {
+          "n": 9,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            2,
+            7
+          ]
+        },
+        {
+          "n": 10,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            2,
+            8
+          ]
+        },
+        {
+          "n": 11,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            3,
+            8
+          ]
+        },
+        {
+          "n": 12,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            4,
+            8
+          ]
+        },
+        {
+          "n": 13,
+          "winner": 1,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            4,
+            9
+          ]
+        },
+        {
+          "n": 14,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            4,
+            10
+          ]
+        },
+        {
+          "n": 15,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            5,
+            10
+          ]
+        },
+        {
+          "n": 16,
+          "winner": 0,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            6,
+            10
+          ]
+        },
+        {
+          "n": 17,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            7,
+            10
+          ]
+        },
+        {
+          "n": 18,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            8,
+            10
+          ]
+        },
+        {
+          "n": 19,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            8,
+            11
+          ]
+        },
+        {
+          "n": 20,
+          "winner": 1,
+          "side": "CT",
+          "type": "stopwatch",
+          "score": [
+            8,
+            12
+          ]
+        },
+        {
+          "n": 21,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            8,
+            13
+          ]
+        }
+      ],
+      "players": [
+        [
+          {
+            "name": "huNter-",
+            "kills": 12,
+            "hs": 6,
+            "assists": 4,
+            "deaths": 19,
+            "kast": 64.3,
+            "adr": 73.2,
+            "rating": 0.62
+          },
+          {
+            "name": "malbsMd",
+            "kills": 8,
+            "hs": 4,
+            "assists": 6,
+            "deaths": 15,
+            "kast": 63.4,
+            "adr": 46,
+            "rating": 0.43
+          },
+          {
+            "name": "HeavyGod",
+            "kills": 13,
+            "hs": 7,
+            "assists": 4,
+            "deaths": 18,
+            "kast": 66.9,
+            "adr": 72.4,
+            "rating": 0.73
+          },
+          {
+            "name": "SunPayus",
+            "kills": 16,
+            "hs": 8,
+            "assists": 6,
+            "deaths": 12,
+            "kast": 77.9,
+            "adr": 90.6,
+            "rating": 1.28
+          },
+          {
+            "name": "MATYS",
+            "kills": 14,
+            "hs": 8,
+            "assists": 6,
+            "deaths": 15,
+            "kast": 75.3,
+            "adr": 79.9,
+            "rating": 0.96
+          }
+        ],
+        [
+          {
+            "name": "XANTARES",
+            "kills": 22,
+            "hs": 13,
+            "assists": 6,
+            "deaths": 19,
+            "kast": 75.3,
+            "adr": 125.1,
+            "rating": 1.5
+          },
+          {
+            "name": "woxic",
+            "kills": 15,
+            "hs": 6,
+            "assists": 7,
+            "deaths": 11,
+            "kast": 75.8,
+            "adr": 89.5,
+            "rating": 1.25
+          },
+          {
+            "name": "MAJ3R",
+            "kills": 12,
+            "hs": 7,
+            "assists": 7,
+            "deaths": 11,
+            "kast": 78.1,
+            "adr": 70.1,
+            "rating": 0.97
+          },
+          {
+            "name": "wicadia",
+            "kills": 16,
+            "hs": 9,
+            "assists": 5,
+            "deaths": 13,
+            "kast": 79.7,
+            "adr": 87.8,
+            "rating": 1.22
+          },
+          {
+            "name": "jottAAA",
+            "kills": 14,
+            "hs": 6,
+            "assists": 4,
+            "deaths": 9,
+            "kast": 82,
+            "adr": 83.9,
+            "rating": 1.25
+          }
+        ]
+      ]
+    },
+    {
+      "version": 1,
+      "source": "fake",
+      "mapStatsId": 99000502,
+      "matchId": 990005,
+      "event": "IEM Dallas 2026 — Phase de groupes (fictif)",
+      "date": 1779480360000,
+      "map": "Anubis",
+      "teams": [
+        {
+          "name": "G2",
+          "score": 13,
+          "startSide": "T"
+        },
+        {
+          "name": "Aurora",
+          "score": 11,
+          "startSide": "CT"
+        }
+      ],
+      "halves": [
+        [
+          2,
+          10
+        ],
+        [
+          11,
+          1
+        ]
+      ],
+      "rounds": [
+        {
+          "n": 1,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            1,
+            0
+          ]
+        },
+        {
+          "n": 2,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            1,
+            1
+          ]
+        },
+        {
+          "n": 3,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            1,
+            2
+          ]
+        },
+        {
+          "n": 4,
+          "winner": 1,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            1,
+            3
+          ]
+        },
+        {
+          "n": 5,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            1,
+            4
+          ]
+        },
+        {
+          "n": 6,
+          "winner": 1,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            1,
+            5
+          ]
+        },
+        {
+          "n": 7,
+          "winner": 0,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            2,
+            5
+          ]
+        },
+        {
+          "n": 8,
+          "winner": 1,
+          "side": "CT",
+          "type": "stopwatch",
+          "score": [
+            2,
+            6
+          ]
+        },
+        {
+          "n": 9,
+          "winner": 1,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            2,
+            7
+          ]
+        },
+        {
+          "n": 10,
+          "winner": 1,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            2,
+            8
+          ]
+        },
+        {
+          "n": 11,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            2,
+            9
+          ]
+        },
+        {
+          "n": 12,
+          "winner": 1,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            2,
+            10
+          ]
+        },
+        {
+          "n": 13,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            3,
+            10
+          ]
+        },
+        {
+          "n": 14,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            3,
+            11
+          ]
+        },
+        {
+          "n": 15,
+          "winner": 0,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            4,
+            11
+          ]
+        },
+        {
+          "n": 16,
+          "winner": 0,
+          "side": "CT",
+          "type": "stopwatch",
+          "score": [
+            5,
+            11
+          ]
+        },
+        {
+          "n": 17,
+          "winner": 0,
+          "side": "CT",
+          "type": "stopwatch",
+          "score": [
+            6,
+            11
+          ]
+        },
+        {
+          "n": 18,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            7,
+            11
+          ]
+        },
+        {
+          "n": 19,
+          "winner": 0,
+          "side": "CT",
+          "type": "stopwatch",
+          "score": [
+            8,
+            11
+          ]
+        },
+        {
+          "n": 20,
+          "winner": 0,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            9,
+            11
+          ]
+        },
+        {
+          "n": 21,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            10,
+            11
+          ]
+        },
+        {
+          "n": 22,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            11,
+            11
+          ]
+        },
+        {
+          "n": 23,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            12,
+            11
+          ]
+        },
+        {
+          "n": 24,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            13,
+            11
+          ]
+        }
+      ],
+      "players": [
+        [
+          {
+            "name": "huNter-",
+            "kills": 17,
+            "hs": 9,
+            "assists": 5,
+            "deaths": 15,
+            "kast": 76.2,
+            "adr": 84.8,
+            "rating": 1.13
+          },
+          {
+            "name": "malbsMd",
+            "kills": 9,
+            "hs": 5,
+            "assists": 8,
+            "deaths": 14,
+            "kast": 62.4,
+            "adr": 51.8,
+            "rating": 0.57
+          },
+          {
+            "name": "HeavyGod",
+            "kills": 17,
+            "hs": 8,
+            "assists": 7,
+            "deaths": 11,
+            "kast": 80.2,
+            "adr": 87.2,
+            "rating": 1.3
+          },
+          {
+            "name": "SunPayus",
+            "kills": 19,
+            "hs": 8,
+            "assists": 6,
+            "deaths": 20,
+            "kast": 73.7,
+            "adr": 94.3,
+            "rating": 1.08
+          },
+          {
+            "name": "MATYS",
+            "kills": 10,
+            "hs": 6,
+            "assists": 6,
+            "deaths": 15,
+            "kast": 69.9,
+            "adr": 49.5,
+            "rating": 0.58
+          }
+        ],
+        [
+          {
+            "name": "XANTARES",
+            "kills": 20,
+            "hs": 8,
+            "assists": 4,
+            "deaths": 12,
+            "kast": 82.3,
+            "adr": 98.3,
+            "rating": 1.47
+          },
+          {
+            "name": "woxic",
+            "kills": 19,
+            "hs": 9,
+            "assists": 5,
+            "deaths": 15,
+            "kast": 75.2,
+            "adr": 91,
+            "rating": 1.27
+          },
+          {
+            "name": "MAJ3R",
+            "kills": 5,
+            "hs": 3,
+            "assists": 4,
+            "deaths": 9,
+            "kast": 68.4,
+            "adr": 32.1,
+            "rating": 0.45
+          },
+          {
+            "name": "wicadia",
+            "kills": 9,
+            "hs": 4,
+            "assists": 8,
+            "deaths": 14,
+            "kast": 69.4,
+            "adr": 50.9,
+            "rating": 0.56
+          },
+          {
+            "name": "jottAAA",
+            "kills": 22,
+            "hs": 10,
+            "assists": 5,
+            "deaths": 22,
+            "kast": 74,
+            "adr": 107.7,
+            "rating": 1.23
+          }
+        ]
+      ]
+    },
+    {
+      "version": 1,
+      "source": "fake",
+      "mapStatsId": 99000503,
+      "matchId": 990005,
+      "event": "IEM Dallas 2026 — Phase de groupes (fictif)",
+      "date": 1779484320000,
+      "map": "Train",
+      "teams": [
+        {
+          "name": "G2",
+          "score": 13,
+          "startSide": "CT"
+        },
+        {
+          "name": "Aurora",
+          "score": 10,
+          "startSide": "T"
+        }
+      ],
+      "halves": [
+        [
+          4,
+          8
+        ],
+        [
+          9,
+          2
+        ]
+      ],
+      "rounds": [
+        {
+          "n": 1,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            1,
+            0
+          ]
+        },
+        {
+          "n": 2,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            1,
+            1
+          ]
+        },
+        {
+          "n": 3,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            1,
+            2
+          ]
+        },
+        {
+          "n": 4,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            1,
+            3
+          ]
+        },
+        {
+          "n": 5,
+          "winner": 1,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            1,
+            4
+          ]
+        },
+        {
+          "n": 6,
+          "winner": 1,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            1,
+            5
+          ]
+        },
+        {
+          "n": 7,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            1,
+            6
+          ]
+        },
+        {
+          "n": 8,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            2,
+            6
+          ]
+        },
+        {
+          "n": 9,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            3,
+            6
+          ]
+        },
+        {
+          "n": 10,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            3,
+            7
+          ]
+        },
+        {
+          "n": 11,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            3,
+            8
+          ]
+        },
+        {
+          "n": 12,
+          "winner": 0,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            4,
+            8
+          ]
+        },
+        {
+          "n": 13,
+          "winner": 0,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            5,
+            8
+          ]
+        },
+        {
+          "n": 14,
+          "winner": 0,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            6,
+            8
+          ]
+        },
+        {
+          "n": 15,
+          "winner": 0,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            7,
+            8
+          ]
+        },
+        {
+          "n": 16,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            8,
+            8
+          ]
+        },
+        {
+          "n": 17,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            9,
+            8
+          ]
+        },
+        {
+          "n": 18,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            10,
+            8
+          ]
+        },
+        {
+          "n": 19,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            11,
+            8
+          ]
+        },
+        {
+          "n": 20,
+          "winner": 1,
+          "side": "CT",
+          "type": "stopwatch",
+          "score": [
+            11,
+            9
+          ]
+        },
+        {
+          "n": 21,
+          "winner": 0,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            12,
+            9
+          ]
+        },
+        {
+          "n": 22,
+          "winner": 1,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            12,
+            10
+          ]
+        },
+        {
+          "n": 23,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            13,
+            10
+          ]
+        }
+      ],
+      "players": [
+        [
+          {
+            "name": "huNter-",
+            "kills": 9,
+            "hs": 4,
+            "assists": 8,
+            "deaths": 14,
+            "kast": 67.5,
+            "adr": 47,
+            "rating": 0.55
+          },
+          {
+            "name": "malbsMd",
+            "kills": 14,
+            "hs": 5,
+            "assists": 7,
+            "deaths": 13,
+            "kast": 74.5,
+            "adr": 72.9,
+            "rating": 1
+          },
+          {
+            "name": "HeavyGod",
+            "kills": 28,
+            "hs": 16,
+            "assists": 4,
+            "deaths": 10,
+            "kast": 90,
+            "adr": 145.4,
+            "rating": 2.26
+          },
+          {
+            "name": "SunPayus",
+            "kills": 8,
+            "hs": 5,
+            "assists": 6,
+            "deaths": 12,
+            "kast": 61.9,
+            "adr": 44.2,
+            "rating": 0.56
+          },
+          {
+            "name": "MATYS",
+            "kills": 16,
+            "hs": 9,
+            "assists": 5,
+            "deaths": 16,
+            "kast": 70.1,
+            "adr": 80.3,
+            "rating": 1.02
+          }
+        ],
+        [
+          {
+            "name": "XANTARES",
+            "kills": 11,
+            "hs": 6,
+            "assists": 6,
+            "deaths": 12,
+            "kast": 66.6,
+            "adr": 58.3,
+            "rating": 0.8
+          },
+          {
+            "name": "woxic",
+            "kills": 11,
+            "hs": 5,
+            "assists": 3,
+            "deaths": 16,
+            "kast": 66.5,
+            "adr": 59.2,
+            "rating": 0.64
+          },
+          {
+            "name": "MAJ3R",
+            "kills": 12,
+            "hs": 5,
+            "assists": 7,
+            "deaths": 14,
+            "kast": 70.9,
+            "adr": 64,
+            "rating": 0.8
+          },
+          {
+            "name": "wicadia",
+            "kills": 12,
+            "hs": 4,
+            "assists": 3,
+            "deaths": 10,
+            "kast": 70.6,
+            "adr": 64.4,
+            "rating": 0.96
+          },
+          {
+            "name": "jottAAA",
+            "kills": 19,
+            "hs": 11,
+            "assists": 8,
+            "deaths": 23,
+            "kast": 62.6,
+            "adr": 100.9,
+            "rating": 1
+          }
+        ]
+      ]
+    }
+  ]
+}

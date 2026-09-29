@@ -1,0 +1,623 @@
+{
+  "version": 2,
+  "maps": [
+    {
+      "version": 1,
+      "source": "fake",
+      "mapStatsId": 99000301,
+      "matchId": 990003,
+      "event": "ESL Pro League Season 23 — Quart de finale (fictif)",
+      "date": 1773939600000,
+      "map": "Nuke",
+      "teams": [
+        {
+          "name": "Natus Vincere",
+          "score": 3,
+          "startSide": "CT"
+        },
+        {
+          "name": "Falcons",
+          "score": 13,
+          "startSide": "T"
+        }
+      ],
+      "halves": [
+        [
+          2,
+          10
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "rounds": [
+        {
+          "n": 1,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            0,
+            1
+          ]
+        },
+        {
+          "n": 2,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            0,
+            2
+          ]
+        },
+        {
+          "n": 3,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            0,
+            3
+          ]
+        },
+        {
+          "n": 4,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            0,
+            4
+          ]
+        },
+        {
+          "n": 5,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            0,
+            5
+          ]
+        },
+        {
+          "n": 6,
+          "winner": 1,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            0,
+            6
+          ]
+        },
+        {
+          "n": 7,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            0,
+            7
+          ]
+        },
+        {
+          "n": 8,
+          "winner": 1,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            0,
+            8
+          ]
+        },
+        {
+          "n": 9,
+          "winner": 0,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            1,
+            8
+          ]
+        },
+        {
+          "n": 10,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            2,
+            8
+          ]
+        },
+        {
+          "n": 11,
+          "winner": 1,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            2,
+            9
+          ]
+        },
+        {
+          "n": 12,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            2,
+            10
+          ]
+        },
+        {
+          "n": 13,
+          "winner": 1,
+          "side": "CT",
+          "type": "stopwatch",
+          "score": [
+            2,
+            11
+          ]
+        },
+        {
+          "n": 14,
+          "winner": 1,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            2,
+            12
+          ]
+        },
+        {
+          "n": 15,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            3,
+            12
+          ]
+        },
+        {
+          "n": 16,
+          "winner": 1,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            3,
+            13
+          ]
+        }
+      ],
+      "players": [
+        [
+          {
+            "name": "Aleksib",
+            "kills": 6,
+            "hs": 4,
+            "assists": 6,
+            "deaths": 11,
+            "kast": 63.9,
+            "adr": 48.4,
+            "rating": 0.46
+          },
+          {
+            "name": "iM",
+            "kills": 10,
+            "hs": 5,
+            "assists": 3,
+            "deaths": 13,
+            "kast": 71,
+            "adr": 74.9,
+            "rating": 0.79
+          },
+          {
+            "name": "b1t",
+            "kills": 5,
+            "hs": 3,
+            "assists": 7,
+            "deaths": 11,
+            "kast": 61.4,
+            "adr": 42.2,
+            "rating": 0.35
+          },
+          {
+            "name": "w0nderful",
+            "kills": 11,
+            "hs": 4,
+            "assists": 6,
+            "deaths": 16,
+            "kast": 59.7,
+            "adr": 79.2,
+            "rating": 0.72
+          },
+          {
+            "name": "jL",
+            "kills": 9,
+            "hs": 5,
+            "assists": 5,
+            "deaths": 12,
+            "kast": 70.7,
+            "adr": 69.5,
+            "rating": 0.74
+          }
+        ],
+        [
+          {
+            "name": "NiKo",
+            "kills": 16,
+            "hs": 7,
+            "assists": 4,
+            "deaths": 9,
+            "kast": 83.4,
+            "adr": 121.8,
+            "rating": 1.74
+          },
+          {
+            "name": "m0NESY",
+            "kills": 13,
+            "hs": 8,
+            "assists": 4,
+            "deaths": 8,
+            "kast": 77.1,
+            "adr": 98.8,
+            "rating": 1.45
+          },
+          {
+            "name": "kyousuke",
+            "kills": 12,
+            "hs": 7,
+            "assists": 3,
+            "deaths": 10,
+            "kast": 72.1,
+            "adr": 86.6,
+            "rating": 1.19
+          },
+          {
+            "name": "TeSeS",
+            "kills": 11,
+            "hs": 7,
+            "assists": 8,
+            "deaths": 10,
+            "kast": 77.1,
+            "adr": 84.8,
+            "rating": 1.1
+          },
+          {
+            "name": "Magisk",
+            "kills": 11,
+            "hs": 5,
+            "assists": 7,
+            "deaths": 4,
+            "kast": 83.4,
+            "adr": 80,
+            "rating": 1.44
+          }
+        ]
+      ]
+    },
+    {
+      "version": 1,
+      "source": "fake",
+      "mapStatsId": 99000302,
+      "matchId": 990003,
+      "event": "ESL Pro League Season 23 — Quart de finale (fictif)",
+      "date": 1773943560000,
+      "map": "Inferno",
+      "teams": [
+        {
+          "name": "Falcons",
+          "score": 13,
+          "startSide": "CT"
+        },
+        {
+          "name": "Natus Vincere",
+          "score": 5,
+          "startSide": "T"
+        }
+      ],
+      "halves": [
+        [
+          7,
+          5
+        ],
+        [
+          6,
+          0
+        ]
+      ],
+      "rounds": [
+        {
+          "n": 1,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            0,
+            1
+          ]
+        },
+        {
+          "n": 2,
+          "winner": 1,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            0,
+            2
+          ]
+        },
+        {
+          "n": 3,
+          "winner": 1,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            0,
+            3
+          ]
+        },
+        {
+          "n": 4,
+          "winner": 1,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            0,
+            4
+          ]
+        },
+        {
+          "n": 5,
+          "winner": 0,
+          "side": "CT",
+          "type": "stopwatch",
+          "score": [
+            1,
+            4
+          ]
+        },
+        {
+          "n": 6,
+          "winner": 0,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            2,
+            4
+          ]
+        },
+        {
+          "n": 7,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            3,
+            4
+          ]
+        },
+        {
+          "n": 8,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            4,
+            4
+          ]
+        },
+        {
+          "n": 9,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            5,
+            4
+          ]
+        },
+        {
+          "n": 10,
+          "winner": 0,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            6,
+            4
+          ]
+        },
+        {
+          "n": 11,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            7,
+            4
+          ]
+        },
+        {
+          "n": 12,
+          "winner": 1,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            7,
+            5
+          ]
+        },
+        {
+          "n": 13,
+          "winner": 0,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            8,
+            5
+          ]
+        },
+        {
+          "n": 14,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            9,
+            5
+          ]
+        },
+        {
+          "n": 15,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            10,
+            5
+          ]
+        },
+        {
+          "n": 16,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            11,
+            5
+          ]
+        },
+        {
+          "n": 17,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            12,
+            5
+          ]
+        },
+        {
+          "n": 18,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            13,
+            5
+          ]
+        }
+      ],
+      "players": [
+        [
+          {
+            "name": "NiKo",
+            "kills": 14,
+            "hs": 8,
+            "assists": 8,
+            "deaths": 10,
+            "kast": 77.5,
+            "adr": 92.7,
+            "rating": 1.32
+          },
+          {
+            "name": "m0NESY",
+            "kills": 21,
+            "hs": 10,
+            "assists": 4,
+            "deaths": 9,
+            "kast": 87.3,
+            "adr": 135.4,
+            "rating": 2.09
+          },
+          {
+            "name": "kyousuke",
+            "kills": 17,
+            "hs": 7,
+            "assists": 4,
+            "deaths": 7,
+            "kast": 90,
+            "adr": 114,
+            "rating": 1.8
+          },
+          {
+            "name": "TeSeS",
+            "kills": 13,
+            "hs": 7,
+            "assists": 4,
+            "deaths": 9,
+            "kast": 74.5,
+            "adr": 83.6,
+            "rating": 1.26
+          },
+          {
+            "name": "Magisk",
+            "kills": 7,
+            "hs": 4,
+            "assists": 7,
+            "deaths": 15,
+            "kast": 63.1,
+            "adr": 50.5,
+            "rating": 0.35
+          }
+        ],
+        [
+          {
+            "name": "Aleksib",
+            "kills": 3,
+            "hs": 1,
+            "assists": 7,
+            "deaths": 18,
+            "kast": 52,
+            "adr": 25.1,
+            "rating": 0.35
+          },
+          {
+            "name": "iM",
+            "kills": 10,
+            "hs": 5,
+            "assists": 4,
+            "deaths": 15,
+            "kast": 62.7,
+            "adr": 66.2,
+            "rating": 0.64
+          },
+          {
+            "name": "b1t",
+            "kills": 11,
+            "hs": 5,
+            "assists": 7,
+            "deaths": 11,
+            "kast": 70.2,
+            "adr": 73.8,
+            "rating": 0.96
+          },
+          {
+            "name": "w0nderful",
+            "kills": 14,
+            "hs": 7,
+            "assists": 5,
+            "deaths": 13,
+            "kast": 77.8,
+            "adr": 96.3,
+            "rating": 1.18
+          },
+          {
+            "name": "jL",
+            "kills": 12,
+            "hs": 6,
+            "assists": 5,
+            "deaths": 15,
+            "kast": 65.4,
+            "adr": 82.8,
+            "rating": 0.86
+          }
+        ]
+      ]
+    }
+  ]
+}

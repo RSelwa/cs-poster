@@ -1,0 +1,1894 @@
+{
+  "version": 2,
+  "maps": [
+    {
+      "version": 1,
+      "source": "fake",
+      "mapStatsId": 99000101,
+      "matchId": 990001,
+      "event": "IEM Cologne 2026 — Grande finale (fictif)",
+      "date": 1785078000000,
+      "map": "Mirage",
+      "teams": [
+        {
+          "name": "Vitality",
+          "score": 13,
+          "startSide": "CT"
+        },
+        {
+          "name": "Team Spirit",
+          "score": 9,
+          "startSide": "T"
+        }
+      ],
+      "halves": [
+        [
+          7,
+          5
+        ],
+        [
+          6,
+          4
+        ]
+      ],
+      "rounds": [
+        {
+          "n": 1,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            1,
+            0
+          ]
+        },
+        {
+          "n": 2,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            1,
+            1
+          ]
+        },
+        {
+          "n": 3,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            1,
+            2
+          ]
+        },
+        {
+          "n": 4,
+          "winner": 1,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            1,
+            3
+          ]
+        },
+        {
+          "n": 5,
+          "winner": 0,
+          "side": "CT",
+          "type": "stopwatch",
+          "score": [
+            2,
+            3
+          ]
+        },
+        {
+          "n": 6,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            3,
+            3
+          ]
+        },
+        {
+          "n": 7,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            4,
+            3
+          ]
+        },
+        {
+          "n": 8,
+          "winner": 1,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            4,
+            4
+          ]
+        },
+        {
+          "n": 9,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            5,
+            4
+          ]
+        },
+        {
+          "n": 10,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            6,
+            4
+          ]
+        },
+        {
+          "n": 11,
+          "winner": 0,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            7,
+            4
+          ]
+        },
+        {
+          "n": 12,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            7,
+            5
+          ]
+        },
+        {
+          "n": 13,
+          "winner": 0,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            8,
+            5
+          ]
+        },
+        {
+          "n": 14,
+          "winner": 1,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            8,
+            6
+          ]
+        },
+        {
+          "n": 15,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            8,
+            7
+          ]
+        },
+        {
+          "n": 16,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            9,
+            7
+          ]
+        },
+        {
+          "n": 17,
+          "winner": 0,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            10,
+            7
+          ]
+        },
+        {
+          "n": 18,
+          "winner": 0,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            11,
+            7
+          ]
+        },
+        {
+          "n": 19,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            12,
+            7
+          ]
+        },
+        {
+          "n": 20,
+          "winner": 1,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            12,
+            8
+          ]
+        },
+        {
+          "n": 21,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            12,
+            9
+          ]
+        },
+        {
+          "n": 22,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            13,
+            9
+          ]
+        }
+      ],
+      "players": [
+        [
+          {
+            "name": "apEX",
+            "kills": 7,
+            "hs": 3,
+            "assists": 5,
+            "deaths": 10,
+            "kast": 65.9,
+            "adr": 41.9,
+            "rating": 0.57
+          },
+          {
+            "name": "ZywOo",
+            "kills": 20,
+            "hs": 7,
+            "assists": 5,
+            "deaths": 11,
+            "kast": 85.7,
+            "adr": 109,
+            "rating": 1.62
+          },
+          {
+            "name": "ropz",
+            "kills": 19,
+            "hs": 8,
+            "assists": 8,
+            "deaths": 14,
+            "kast": 77.2,
+            "adr": 102.5,
+            "rating": 1.4
+          },
+          {
+            "name": "flameZ",
+            "kills": 15,
+            "hs": 6,
+            "assists": 6,
+            "deaths": 15,
+            "kast": 74,
+            "adr": 82.1,
+            "rating": 1.03
+          },
+          {
+            "name": "mezii",
+            "kills": 14,
+            "hs": 7,
+            "assists": 8,
+            "deaths": 11,
+            "kast": 75.5,
+            "adr": 78.1,
+            "rating": 1.12
+          }
+        ],
+        [
+          {
+            "name": "chopper",
+            "kills": 7,
+            "hs": 3,
+            "assists": 4,
+            "deaths": 21,
+            "kast": 52,
+            "adr": 44.5,
+            "rating": 0.35
+          },
+          {
+            "name": "donk",
+            "kills": 19,
+            "hs": 11,
+            "assists": 7,
+            "deaths": 16,
+            "kast": 79,
+            "adr": 102.2,
+            "rating": 1.32
+          },
+          {
+            "name": "zont1x",
+            "kills": 14,
+            "hs": 8,
+            "assists": 5,
+            "deaths": 15,
+            "kast": 73.5,
+            "adr": 77.6,
+            "rating": 0.94
+          },
+          {
+            "name": "sh1ro",
+            "kills": 11,
+            "hs": 6,
+            "assists": 4,
+            "deaths": 13,
+            "kast": 72.4,
+            "adr": 58.9,
+            "rating": 0.76
+          },
+          {
+            "name": "zweih",
+            "kills": 10,
+            "hs": 5,
+            "assists": 3,
+            "deaths": 10,
+            "kast": 71.8,
+            "adr": 56.5,
+            "rating": 0.82
+          }
+        ]
+      ]
+    },
+    {
+      "version": 1,
+      "source": "fake",
+      "mapStatsId": 99000102,
+      "matchId": 990001,
+      "event": "IEM Cologne 2026 — Grande finale (fictif)",
+      "date": 1785081960000,
+      "map": "Ancient",
+      "teams": [
+        {
+          "name": "Vitality",
+          "score": 10,
+          "startSide": "T"
+        },
+        {
+          "name": "Team Spirit",
+          "score": 13,
+          "startSide": "CT"
+        }
+      ],
+      "halves": [
+        [
+          6,
+          6
+        ],
+        [
+          4,
+          7
+        ]
+      ],
+      "rounds": [
+        {
+          "n": 1,
+          "winner": 0,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            1,
+            0
+          ]
+        },
+        {
+          "n": 2,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            1,
+            1
+          ]
+        },
+        {
+          "n": 3,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            1,
+            2
+          ]
+        },
+        {
+          "n": 4,
+          "winner": 0,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            2,
+            2
+          ]
+        },
+        {
+          "n": 5,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            3,
+            2
+          ]
+        },
+        {
+          "n": 6,
+          "winner": 1,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            3,
+            3
+          ]
+        },
+        {
+          "n": 7,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            3,
+            4
+          ]
+        },
+        {
+          "n": 8,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            3,
+            5
+          ]
+        },
+        {
+          "n": 9,
+          "winner": 0,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            4,
+            5
+          ]
+        },
+        {
+          "n": 10,
+          "winner": 0,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            5,
+            5
+          ]
+        },
+        {
+          "n": 11,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            5,
+            6
+          ]
+        },
+        {
+          "n": 12,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            6,
+            6
+          ]
+        },
+        {
+          "n": 13,
+          "winner": 1,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            6,
+            7
+          ]
+        },
+        {
+          "n": 14,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            7,
+            7
+          ]
+        },
+        {
+          "n": 15,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            7,
+            8
+          ]
+        },
+        {
+          "n": 16,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            7,
+            9
+          ]
+        },
+        {
+          "n": 17,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            8,
+            9
+          ]
+        },
+        {
+          "n": 18,
+          "winner": 0,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            9,
+            9
+          ]
+        },
+        {
+          "n": 19,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            9,
+            10
+          ]
+        },
+        {
+          "n": 20,
+          "winner": 1,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            9,
+            11
+          ]
+        },
+        {
+          "n": 21,
+          "winner": 1,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            9,
+            12
+          ]
+        },
+        {
+          "n": 22,
+          "winner": 0,
+          "side": "CT",
+          "type": "stopwatch",
+          "score": [
+            10,
+            12
+          ]
+        },
+        {
+          "n": 23,
+          "winner": 1,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            10,
+            13
+          ]
+        }
+      ],
+      "players": [
+        [
+          {
+            "name": "apEX",
+            "kills": 14,
+            "hs": 5,
+            "assists": 7,
+            "deaths": 10,
+            "kast": 81.1,
+            "adr": 78,
+            "rating": 1.14
+          },
+          {
+            "name": "ZywOo",
+            "kills": 17,
+            "hs": 9,
+            "assists": 8,
+            "deaths": 18,
+            "kast": 71.2,
+            "adr": 92.5,
+            "rating": 1.05
+          },
+          {
+            "name": "ropz",
+            "kills": 12,
+            "hs": 5,
+            "assists": 7,
+            "deaths": 14,
+            "kast": 69.3,
+            "adr": 65,
+            "rating": 0.8
+          },
+          {
+            "name": "flameZ",
+            "kills": 12,
+            "hs": 5,
+            "assists": 5,
+            "deaths": 15,
+            "kast": 63.1,
+            "adr": 63.8,
+            "rating": 0.76
+          },
+          {
+            "name": "mezii",
+            "kills": 9,
+            "hs": 4,
+            "assists": 8,
+            "deaths": 12,
+            "kast": 67.6,
+            "adr": 48.4,
+            "rating": 0.64
+          }
+        ],
+        [
+          {
+            "name": "chopper",
+            "kills": 12,
+            "hs": 4,
+            "assists": 7,
+            "deaths": 12,
+            "kast": 69.3,
+            "adr": 66.7,
+            "rating": 0.89
+          },
+          {
+            "name": "donk",
+            "kills": 16,
+            "hs": 7,
+            "assists": 6,
+            "deaths": 10,
+            "kast": 79.9,
+            "adr": 87.6,
+            "rating": 1.3
+          },
+          {
+            "name": "zont1x",
+            "kills": 10,
+            "hs": 5,
+            "assists": 7,
+            "deaths": 12,
+            "kast": 71,
+            "adr": 57.5,
+            "rating": 0.73
+          },
+          {
+            "name": "sh1ro",
+            "kills": 20,
+            "hs": 10,
+            "assists": 8,
+            "deaths": 15,
+            "kast": 82.7,
+            "adr": 100,
+            "rating": 1.39
+          },
+          {
+            "name": "zweih",
+            "kills": 11,
+            "hs": 4,
+            "assists": 5,
+            "deaths": 15,
+            "kast": 68.2,
+            "adr": 61,
+            "rating": 0.68
+          }
+        ]
+      ]
+    },
+    {
+      "version": 1,
+      "source": "fake",
+      "mapStatsId": 99000103,
+      "matchId": 990001,
+      "event": "IEM Cologne 2026 — Grande finale (fictif)",
+      "date": 1785085920000,
+      "map": "Inferno",
+      "teams": [
+        {
+          "name": "Team Spirit",
+          "score": 14,
+          "startSide": "T"
+        },
+        {
+          "name": "Vitality",
+          "score": 16,
+          "startSide": "CT"
+        }
+      ],
+      "halves": [
+        [
+          5,
+          7
+        ],
+        [
+          7,
+          5
+        ],
+        [
+          2,
+          4
+        ]
+      ],
+      "rounds": [
+        {
+          "n": 1,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            0,
+            1
+          ]
+        },
+        {
+          "n": 2,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            0,
+            2
+          ]
+        },
+        {
+          "n": 3,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            0,
+            3
+          ]
+        },
+        {
+          "n": 4,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            1,
+            3
+          ]
+        },
+        {
+          "n": 5,
+          "winner": 1,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            1,
+            4
+          ]
+        },
+        {
+          "n": 6,
+          "winner": 0,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            2,
+            4
+          ]
+        },
+        {
+          "n": 7,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            3,
+            4
+          ]
+        },
+        {
+          "n": 8,
+          "winner": 0,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            4,
+            4
+          ]
+        },
+        {
+          "n": 9,
+          "winner": 0,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            5,
+            4
+          ]
+        },
+        {
+          "n": 10,
+          "winner": 1,
+          "side": "CT",
+          "type": "stopwatch",
+          "score": [
+            5,
+            5
+          ]
+        },
+        {
+          "n": 11,
+          "winner": 1,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            5,
+            6
+          ]
+        },
+        {
+          "n": 12,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            5,
+            7
+          ]
+        },
+        {
+          "n": 13,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            5,
+            8
+          ]
+        },
+        {
+          "n": 14,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            6,
+            8
+          ]
+        },
+        {
+          "n": 15,
+          "winner": 0,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            7,
+            8
+          ]
+        },
+        {
+          "n": 16,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            7,
+            9
+          ]
+        },
+        {
+          "n": 17,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            7,
+            10
+          ]
+        },
+        {
+          "n": 18,
+          "winner": 1,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            7,
+            11
+          ]
+        },
+        {
+          "n": 19,
+          "winner": 0,
+          "side": "CT",
+          "type": "stopwatch",
+          "score": [
+            8,
+            11
+          ]
+        },
+        {
+          "n": 20,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            8,
+            12
+          ]
+        },
+        {
+          "n": 21,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            9,
+            12
+          ]
+        },
+        {
+          "n": 22,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            10,
+            12
+          ]
+        },
+        {
+          "n": 23,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            11,
+            12
+          ]
+        },
+        {
+          "n": 24,
+          "winner": 0,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            12,
+            12
+          ]
+        },
+        {
+          "n": 25,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            13,
+            12
+          ]
+        },
+        {
+          "n": 26,
+          "winner": 1,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            13,
+            13
+          ]
+        },
+        {
+          "n": 27,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            13,
+            14
+          ]
+        },
+        {
+          "n": 28,
+          "winner": 1,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            13,
+            15
+          ]
+        },
+        {
+          "n": 29,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            14,
+            15
+          ]
+        },
+        {
+          "n": 30,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            14,
+            16
+          ]
+        }
+      ],
+      "players": [
+        [
+          {
+            "name": "chopper",
+            "kills": 10,
+            "hs": 4,
+            "assists": 6,
+            "deaths": 20,
+            "kast": 58.6,
+            "adr": 44.3,
+            "rating": 0.4
+          },
+          {
+            "name": "donk",
+            "kills": 18,
+            "hs": 6,
+            "assists": 9,
+            "deaths": 16,
+            "kast": 77.9,
+            "adr": 76.2,
+            "rating": 1.03
+          },
+          {
+            "name": "zont1x",
+            "kills": 13,
+            "hs": 6,
+            "assists": 8,
+            "deaths": 19,
+            "kast": 69.9,
+            "adr": 54.7,
+            "rating": 0.61
+          },
+          {
+            "name": "sh1ro",
+            "kills": 26,
+            "hs": 10,
+            "assists": 8,
+            "deaths": 23,
+            "kast": 70.4,
+            "adr": 99.8,
+            "rating": 1.27
+          },
+          {
+            "name": "zweih",
+            "kills": 19,
+            "hs": 8,
+            "assists": 6,
+            "deaths": 17,
+            "kast": 73.5,
+            "adr": 79.4,
+            "rating": 1.06
+          }
+        ],
+        [
+          {
+            "name": "apEX",
+            "kills": 13,
+            "hs": 5,
+            "assists": 8,
+            "deaths": 22,
+            "kast": 62.7,
+            "adr": 51.3,
+            "rating": 0.51
+          },
+          {
+            "name": "ZywOo",
+            "kills": 19,
+            "hs": 7,
+            "assists": 6,
+            "deaths": 13,
+            "kast": 79.6,
+            "adr": 77.4,
+            "rating": 1.17
+          },
+          {
+            "name": "ropz",
+            "kills": 22,
+            "hs": 13,
+            "assists": 5,
+            "deaths": 14,
+            "kast": 75.8,
+            "adr": 85.5,
+            "rating": 1.32
+          },
+          {
+            "name": "flameZ",
+            "kills": 25,
+            "hs": 12,
+            "assists": 6,
+            "deaths": 18,
+            "kast": 76.3,
+            "adr": 100.9,
+            "rating": 1.39
+          },
+          {
+            "name": "mezii",
+            "kills": 16,
+            "hs": 8,
+            "assists": 5,
+            "deaths": 19,
+            "kast": 65.3,
+            "adr": 63.7,
+            "rating": 0.79
+          }
+        ]
+      ]
+    },
+    {
+      "version": 1,
+      "source": "fake",
+      "mapStatsId": 99000104,
+      "matchId": 990001,
+      "event": "IEM Cologne 2026 — Grande finale (fictif)",
+      "date": 1785089880000,
+      "map": "Nuke",
+      "teams": [
+        {
+          "name": "Vitality",
+          "score": 7,
+          "startSide": "T"
+        },
+        {
+          "name": "Team Spirit",
+          "score": 13,
+          "startSide": "CT"
+        }
+      ],
+      "halves": [
+        [
+          5,
+          7
+        ],
+        [
+          2,
+          6
+        ]
+      ],
+      "rounds": [
+        {
+          "n": 1,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            0,
+            1
+          ]
+        },
+        {
+          "n": 2,
+          "winner": 0,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            1,
+            1
+          ]
+        },
+        {
+          "n": 3,
+          "winner": 1,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            1,
+            2
+          ]
+        },
+        {
+          "n": 4,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            1,
+            3
+          ]
+        },
+        {
+          "n": 5,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            1,
+            4
+          ]
+        },
+        {
+          "n": 6,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            1,
+            5
+          ]
+        },
+        {
+          "n": 7,
+          "winner": 0,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            2,
+            5
+          ]
+        },
+        {
+          "n": 8,
+          "winner": 1,
+          "side": "CT",
+          "type": "stopwatch",
+          "score": [
+            2,
+            6
+          ]
+        },
+        {
+          "n": 9,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            2,
+            7
+          ]
+        },
+        {
+          "n": 10,
+          "winner": 0,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            3,
+            7
+          ]
+        },
+        {
+          "n": 11,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            4,
+            7
+          ]
+        },
+        {
+          "n": 12,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            5,
+            7
+          ]
+        },
+        {
+          "n": 13,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            6,
+            7
+          ]
+        },
+        {
+          "n": 14,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            6,
+            8
+          ]
+        },
+        {
+          "n": 15,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            6,
+            9
+          ]
+        },
+        {
+          "n": 16,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            6,
+            10
+          ]
+        },
+        {
+          "n": 17,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            6,
+            11
+          ]
+        },
+        {
+          "n": 18,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            6,
+            12
+          ]
+        },
+        {
+          "n": 19,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            7,
+            12
+          ]
+        },
+        {
+          "n": 20,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            7,
+            13
+          ]
+        }
+      ],
+      "players": [
+        [
+          {
+            "name": "apEX",
+            "kills": 8,
+            "hs": 4,
+            "assists": 7,
+            "deaths": 14,
+            "kast": 64.5,
+            "adr": 47.5,
+            "rating": 0.48
+          },
+          {
+            "name": "ZywOo",
+            "kills": 17,
+            "hs": 6,
+            "assists": 4,
+            "deaths": 5,
+            "kast": 90,
+            "adr": 103.3,
+            "rating": 1.76
+          },
+          {
+            "name": "ropz",
+            "kills": 11,
+            "hs": 6,
+            "assists": 6,
+            "deaths": 16,
+            "kast": 67,
+            "adr": 70.2,
+            "rating": 0.68
+          },
+          {
+            "name": "flameZ",
+            "kills": 10,
+            "hs": 5,
+            "assists": 5,
+            "deaths": 21,
+            "kast": 52,
+            "adr": 60.8,
+            "rating": 0.35
+          },
+          {
+            "name": "mezii",
+            "kills": 9,
+            "hs": 4,
+            "assists": 6,
+            "deaths": 18,
+            "kast": 59.8,
+            "adr": 59,
+            "rating": 0.4
+          }
+        ],
+        [
+          {
+            "name": "chopper",
+            "kills": 15,
+            "hs": 8,
+            "assists": 6,
+            "deaths": 11,
+            "kast": 76.6,
+            "adr": 91.2,
+            "rating": 1.28
+          },
+          {
+            "name": "donk",
+            "kills": 18,
+            "hs": 8,
+            "assists": 4,
+            "deaths": 8,
+            "kast": 89.6,
+            "adr": 110.8,
+            "rating": 1.71
+          },
+          {
+            "name": "zont1x",
+            "kills": 14,
+            "hs": 7,
+            "assists": 6,
+            "deaths": 12,
+            "kast": 76.7,
+            "adr": 81.3,
+            "rating": 1.13
+          },
+          {
+            "name": "sh1ro",
+            "kills": 17,
+            "hs": 6,
+            "assists": 4,
+            "deaths": 12,
+            "kast": 78.2,
+            "adr": 104.2,
+            "rating": 1.43
+          },
+          {
+            "name": "zweih",
+            "kills": 10,
+            "hs": 6,
+            "assists": 6,
+            "deaths": 12,
+            "kast": 71.7,
+            "adr": 59.4,
+            "rating": 0.76
+          }
+        ]
+      ]
+    },
+    {
+      "version": 1,
+      "source": "fake",
+      "mapStatsId": 99000105,
+      "matchId": 990001,
+      "event": "IEM Cologne 2026 — Grande finale (fictif)",
+      "date": 1785093840000,
+      "map": "Dust2",
+      "teams": [
+        {
+          "name": "Vitality",
+          "score": 13,
+          "startSide": "CT"
+        },
+        {
+          "name": "Team Spirit",
+          "score": 11,
+          "startSide": "T"
+        }
+      ],
+      "halves": [
+        [
+          4,
+          8
+        ],
+        [
+          9,
+          3
+        ]
+      ],
+      "rounds": [
+        {
+          "n": 1,
+          "winner": 1,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            0,
+            1
+          ]
+        },
+        {
+          "n": 2,
+          "winner": 0,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            1,
+            1
+          ]
+        },
+        {
+          "n": 3,
+          "winner": 1,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            1,
+            2
+          ]
+        },
+        {
+          "n": 4,
+          "winner": 0,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            2,
+            2
+          ]
+        },
+        {
+          "n": 5,
+          "winner": 0,
+          "side": "CT",
+          "type": "stopwatch",
+          "score": [
+            3,
+            2
+          ]
+        },
+        {
+          "n": 6,
+          "winner": 1,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            3,
+            3
+          ]
+        },
+        {
+          "n": 7,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            3,
+            4
+          ]
+        },
+        {
+          "n": 8,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            3,
+            5
+          ]
+        },
+        {
+          "n": 9,
+          "winner": 0,
+          "side": "CT",
+          "type": "bomb_defused",
+          "score": [
+            4,
+            5
+          ]
+        },
+        {
+          "n": 10,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            4,
+            6
+          ]
+        },
+        {
+          "n": 11,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            4,
+            7
+          ]
+        },
+        {
+          "n": 12,
+          "winner": 1,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            4,
+            8
+          ]
+        },
+        {
+          "n": 13,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            4,
+            9
+          ]
+        },
+        {
+          "n": 14,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            5,
+            9
+          ]
+        },
+        {
+          "n": 15,
+          "winner": 0,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            6,
+            9
+          ]
+        },
+        {
+          "n": 16,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            7,
+            9
+          ]
+        },
+        {
+          "n": 17,
+          "winner": 0,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            8,
+            9
+          ]
+        },
+        {
+          "n": 18,
+          "winner": 0,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            9,
+            9
+          ]
+        },
+        {
+          "n": 19,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            10,
+            9
+          ]
+        },
+        {
+          "n": 20,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            11,
+            9
+          ]
+        },
+        {
+          "n": 21,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            11,
+            10
+          ]
+        },
+        {
+          "n": 22,
+          "winner": 1,
+          "side": "CT",
+          "type": "ct_win",
+          "score": [
+            11,
+            11
+          ]
+        },
+        {
+          "n": 23,
+          "winner": 0,
+          "side": "T",
+          "type": "t_win",
+          "score": [
+            12,
+            11
+          ]
+        },
+        {
+          "n": 24,
+          "winner": 0,
+          "side": "T",
+          "type": "bomb_exploded",
+          "score": [
+            13,
+            11
+          ]
+        }
+      ],
+      "players": [
+        [
+          {
+            "name": "apEX",
+            "kills": 12,
+            "hs": 4,
+            "assists": 4,
+            "deaths": 18,
+            "kast": 67.2,
+            "adr": 65.3,
+            "rating": 0.64
+          },
+          {
+            "name": "ZywOo",
+            "kills": 23,
+            "hs": 11,
+            "assists": 5,
+            "deaths": 11,
+            "kast": 85.1,
+            "adr": 114.9,
+            "rating": 1.76
+          },
+          {
+            "name": "ropz",
+            "kills": 18,
+            "hs": 7,
+            "assists": 4,
+            "deaths": 15,
+            "kast": 75,
+            "adr": 90.6,
+            "rating": 1.21
+          },
+          {
+            "name": "flameZ",
+            "kills": 15,
+            "hs": 8,
+            "assists": 6,
+            "deaths": 16,
+            "kast": 67.1,
+            "adr": 78.4,
+            "rating": 0.95
+          },
+          {
+            "name": "mezii",
+            "kills": 6,
+            "hs": 3,
+            "assists": 7,
+            "deaths": 14,
+            "kast": 64.3,
+            "adr": 36.8,
+            "rating": 0.35
+          }
+        ],
+        [
+          {
+            "name": "chopper",
+            "kills": 10,
+            "hs": 5,
+            "assists": 6,
+            "deaths": 12,
+            "kast": 66.8,
+            "adr": 51.3,
+            "rating": 0.7
+          },
+          {
+            "name": "donk",
+            "kills": 19,
+            "hs": 8,
+            "assists": 5,
+            "deaths": 10,
+            "kast": 84,
+            "adr": 98.2,
+            "rating": 1.5
+          },
+          {
+            "name": "zont1x",
+            "kills": 15,
+            "hs": 9,
+            "assists": 8,
+            "deaths": 15,
+            "kast": 71.9,
+            "adr": 77.5,
+            "rating": 0.98
+          },
+          {
+            "name": "sh1ro",
+            "kills": 19,
+            "hs": 11,
+            "assists": 5,
+            "deaths": 15,
+            "kast": 72.1,
+            "adr": 94.2,
+            "rating": 1.28
+          },
+          {
+            "name": "zweih",
+            "kills": 11,
+            "hs": 6,
+            "assists": 8,
+            "deaths": 22,
+            "kast": 56.8,
+            "adr": 56.4,
+            "rating": 0.39
+          }
+        ]
+      ]
+    }
+  ]
+}

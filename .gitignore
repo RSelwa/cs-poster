@@ -1,0 +1,6 @@
+node_modules/
+.browser-profile/
+.cache/
+posters/
+.watch-state.json
+.DS_Store
