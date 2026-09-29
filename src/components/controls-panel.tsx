@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ArrowLeftRight, Dices } from 'lucide-react';
+import { ColorField } from '@/components/color-field.tsx';
 import { ParamSlider } from '@/components/param-slider.tsx';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -52,11 +53,8 @@ export const ControlsPanel = ({ match, params, onChange }: Props) => {
       <SectionTitle>Couleurs</SectionTitle>
       <div className="grid grid-cols-2 gap-2">
         {match.teams.map((t, i) => (
-          <label key={i} className="grid min-w-0 gap-1 text-xs text-muted-foreground">
-            <span className="truncate">{t.name}</span>
-            <input type="color" className="h-9 w-full cursor-pointer rounded-md border bg-muted p-0.5" value={params.colors[i]}
-              onChange={(e) => onChange({ colors: i === 0 ? [e.target.value, params.colors[1]] : [params.colors[0], e.target.value] })} />
-          </label>
+          <ColorField key={i} label={t.name} value={params.colors[i]}
+            onChange={(hex) => onChange({ colors: i === 0 ? [hex, params.colors[1]] : [params.colors[0], hex] })} />
         ))}
       </div>
       <div className="mt-2.5 flex gap-2">
