@@ -28,7 +28,7 @@ export function buildMatch(rawMaps: MapData[]): Match {
   const series = aligned.length > 1;
   return {
     version: 2, source: aligned[0].source, event: aligned[0].event, date: aligned[0].date, matchId: aligned[0].matchId || null,
-    series, teams: [0, 1].map((t) => ({ name: names[t], score: series ? mapsWon[t] : roundsWon[t], rounds: roundsWon[t] })) as Match['teams'],
+    series, teams: [0, 1].map((t) => ({ name: names[t], score: series ? mapsWon[t] : roundsWon[t], rounds: roundsWon[t], color: aligned.map((m) => m.teams[t].color).find(Boolean) })) as Match['teams'],
     rounds, maps: aligned, mapInfo,
   };
 }

@@ -25,7 +25,8 @@ export type Player = {
   rating?: number | null;
 };
 
-export type MapTeam = { name: string; score: number; startSide?: string };
+// color : couleur de l'équipe (#rrggbb) quand la source la connaît, sinon la palette par défaut s'applique
+export type MapTeam = { name: string; score: number; startSide?: string; color?: string };
 
 export type MapData = {
   version: number;
@@ -45,7 +46,7 @@ export type MatchExport = { version: 2; maps: MapData[] };
 
 export type MatchRound = Round & { map: number; mapRound: number };
 export type MapInfo = { map: string; score: Pair<number>; mapStatsId: number | null; start: number; len: number };
-export type MatchTeam = { name: string; score: number; rounds: number };
+export type MatchTeam = { name: string; score: number; rounds: number; color?: string };
 
 export type Match = {
   version: 2;

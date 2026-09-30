@@ -40,8 +40,9 @@ Chrome or `npx playwright install chromium`.
 | `server/bo3.ts` | bo3.gg JSON API (`api.bo3.gg/api/v1`, undocumented, no Cloudflare, plain `fetch`, ≥ 1 s apart) → maps in the project format. **All bo3.gg field names live here.** Per-round per-team kills (`game_round_team_clans[].kills`) go into `round.kills` as `{team}` without `t`. A game is ready when `state === 'done'`, all `rounds_count` rounds are there and 10 player stats |
 | `server/matches.ts` | recent list (60 s memory cache, merged with the poster index) and `loadMatch` (disk cache first) |
 | `server/watcher.ts` | every interval: finished matches of `TIERS` ended within the lookback and without a poster → render once ready (~10–20 min after the end, demos parsed), else retry next pass |
-| `server/render.ts` | bundles `src/core/index.ts` once with Vite's `build()` (IIFE, `window.PosterCore`, `write: false`), headless Chromium draws it with Google Fonts, `DEFAULTS` + `defaultColors` → PNG buffer |
-| `server/store.ts` | **the persistence boundary**, today files in `data/` (gitignored): `data/matches/<slug>.json` (maps of a fully parsed match, immutable), `data/posters/<slug>.png`, `data/posters.json` (index by bo3 match id). Swap this module for the DB |
+| `server/render.ts` | bundles `src/core/index.ts` once with Vite's `build()` (IIFE, `window.PosterCore`, `write: false`), headless Chromium draws it with Google Fonts + `LOCAL_FONTS` (embedded as `data:`), `DEFAULTS` + `defaultColors` → PNG buffer. `readPixels` decodes an image (webp) for the team colors |
+| `server/team-colors.ts` | team color: `TEAM_COLORS` (by bo3 slug, hand-picked) first, else the dominant saturated hue of the bo3 logo (`image_url`), else of the jersey (`tshirt_image_url`), capped to pigment tones. Cached per team id in `data/teams.json`, re-extracted when the image urls change. `loadMatch` writes it into `MapTeam.color` before caching the match; black-and-white logos give `null` → palette |
+| `server/store.ts` | **the persistence boundary**, today files in `data/` (gitignored): `data/matches/<slug>.json` (maps of a fully parsed match, immutable), `data/posters/<slug>.png`, `data/posters.json` (index by bo3 match id), `data/teams.json` (extracted team colors). Swap this module for the DB |
 | `fixtures/` | fake tier-1 matches as import JSON (`{ version: 2, label, maps }`, `source: "fake"`, events suffixed "(fictif)"). `pnpm fixtures` regenerates them deterministically; scenarios are in `generate.mjs` → `MATCHES` |
 
 ## Data flow
@@ -107,6 +108,8 @@ Chrome or `npx playwright install chromium`.
 - Determinism: same `seed` + same data → same poster. Two RNG streams: `rnd` drives geometry,
   `rp` drives the grain only. Don't cross them, or tweaking the grain will move strokes.
 - Themes: `paper` (multiply) / `ink` (screen, team colors lifted).
+- Team colors: `defaultColors(match.teams)` takes each team's `color` when present, else the `PAIRS` palette (hashed on names). Two colors closer than `CLASH_DISTANCE` (RGB): team 1 gets the palette color farthest from team 0's.
+- Background text (`showBgData`): `bgText: 'data'` (match JSON, mono, default) or `'players'` (nicknames of both teams, uppercase sans, repeated).
 - Parameters: `PosterParams` + `DEFAULTS` in `src/core/render.ts`. Editor sliders are declared in
   `SLIDERS` / `TOGGLES` in `src/components/controls-panel.tsx` — a new param needs both.
 - The TS port of the old `core.js` was checked pixel-identical on all fixtures, both themes. Any
@@ -123,6 +126,7 @@ Import also accepts a bare map or an array; `rounds` and `teams` are required.
 - Own code: dense one-liner style, 2-space indent, semicolons, single quotes, `.ts` extensions on
   relative imports. Components are arrow consts, kebab-case filenames. shadcn files keep their
   generated style (double quotes, no semicolons).
+- Local fonts: file in `public/fonts/`, entry in `LOCAL_FONTS` (`src/core/fonts.ts`, `weight` may be a range for a variable font), family put first in the wanted role of `FONTS` (`serif`: title and score, `sans`: texts and player background, `mono`: footer and data background). The editor loads it from `/fonts/`, the headless renderer reads it from disk.
 - Styling: Tailwind utilities on shadcn tokens (`src/index.css`: grey-green ground, light panels,
   ink `#1c2420`, `--paper` for the sheet). Fonts: Familjen Grotesk (sans), Instrument Serif,
   DM Mono — the same three the poster uses.

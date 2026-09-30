@@ -16,7 +16,7 @@ import { addMaps, parseImport, type LoadedMatch } from '@/lib/loaded-matches.ts'
 
 type Status = { message: string; error: boolean };
 
-const colorsFor = (maps: MapData[]) => defaultColors(buildMatch(maps).teams.map((t) => t.name));
+const colorsFor = (maps: MapData[]) => defaultColors(buildMatch(maps).teams);
 
 const initial = () => {
   const { matches, index } = addMaps([], demoMatch());

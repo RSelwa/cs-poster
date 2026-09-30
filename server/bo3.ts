@@ -17,7 +17,7 @@ const PLAYERS_PER_GAME = 10;
 const END_REASON: Record<string, string> = { CTWin: 'ct_win', TerroristsWin: 't_win', TargetBombed: 'bomb_exploded', BombDefused: 'bomb_defused', TargetSaved: 'stopwatch' };
 
 /* ---------- réponses bo3.gg (seulement les champs lus) ---------- */
-type Bo3Team = { id: number; slug: string; name: string };
+type Bo3Team = { id: number; slug: string; name: string; image_url?: string | null; tshirt_image_url?: string | null };
 type Bo3Clan = { clan_name: string; team_id: number };
 type Bo3GameSummary = { id: number; state: string | null; status?: string; map_name: string; number: number };
 export type Bo3Match = {

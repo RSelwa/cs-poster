@@ -1,9 +1,11 @@
 // matches.ts — les matchs vus par l'API et le watcher : liste récente (cache mémoire court) et maps d'un match
 // (cache disque dès qu'il est entièrement parsé, puisqu'il ne change plus).
 
+import type { MapData } from '../src/core/types.ts';
 import type { MatchMaps, MatchSummary } from '../src/lib/api-types.ts';
 import { fetchMatch, listFinished, type Bo3Match } from './bo3.ts';
 import { getMaps, listPosters, saveMaps } from './store.ts';
+import { teamColors } from './team-colors.ts';
 
 const LIST_TTL_MS = 60_000;
 
@@ -34,6 +36,8 @@ export async function loadMatch(slug: string): Promise<MatchMaps> {
   if (cached) return { ready: true, maps: cached };
   const r = await fetchMatch(slug);
   if (!r.ready) return { ready: false, reason: r.reason };
-  await saveMaps(slug, r.maps);
-  return { ready: true, maps: r.maps };
+  const colors = await teamColors([r.match.team1, r.match.team2]);
+  const maps = r.maps.map((m) => ({ ...m, teams: m.teams.map((t, i) => (colors[i] ? { ...t, color: colors[i] } : t)) as MapData['teams'] }));
+  await saveMaps(slug, maps);
+  return { ready: true, maps };
 }

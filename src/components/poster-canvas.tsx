@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { FONTS, FONT_FACES } from '@/core/fonts.ts';
+import { FONTS, FONT_FACES, LOCAL_FONTS, fontFaceCss } from '@/core/fonts.ts';
 import { renderPoster, type PosterParams } from '@/core/render.ts';
 import type { Match } from '@/core/types.ts';
 
@@ -7,6 +7,8 @@ const PREVIEW_FAST = 480;
 const PREVIEW_SHARP = 1000;
 const SHARP_DELAY_MS = 260;
 const FONTS_TIMEOUT_MS = 2500;
+
+document.head.append(Object.assign(document.createElement('style'), { textContent: LOCAL_FONTS.map((f) => fontFaceCss(f, `/fonts/${encodeURIComponent(f.file)}`)).join('') }));
 
 // Les polices du poster sont chargées une fois ; au-delà du délai, on dessine avec les polices de repli.
 const fontsReady = Promise.race([
