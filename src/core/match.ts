@@ -96,3 +96,18 @@ export function keyRounds(match: Match, streakMin: number) {
   });
   return [...out.values()].sort((a, b) => a.i - b.i);
 }
+
+// Élan : pour chaque round, la part de rounds gagnés par l'équipe 0 autour de lui (fenêtre gaussienne, map par map).
+// Une série de 5 rounds → ~0.9 ou ~0.1 ; des rounds alternés → ~0.5. L'équipe 1 a 1 − élan.
+const MOMENTUM_SIGMA = 1.5;
+export function momentum(match: Match) {
+  const reach = Math.ceil(3 * MOMENTUM_SIGMA);
+  return match.maps.flatMap((m) => m.rounds.map((_, i) => {
+    let won = 0, sum = 0;
+    for (let j = Math.max(0, i - reach); j <= Math.min(m.rounds.length - 1, i + reach); j++) {
+      const k = Math.exp(-((j - i) ** 2) / (2 * MOMENTUM_SIGMA ** 2));
+      sum += k; if (m.rounds[j].winner === 0) won += k;
+    }
+    return won / sum;
+  }));
+}

@@ -21,7 +21,7 @@ type SliderDef = [NumericKey, string, number, number, number];
 
 const SLIDERS: [string, SliderDef[]][] = [
   ['Grille', [['cols', 'Colonnes', 4, 14, 1], ['rows', 'Lignes', 6, 36, 1]]],
-  ['Traits', [['strokes', 'Traits par kill', 0.5, 8, 0.1], ['length', 'Longueur', 0.1, 1.2, 0.01], ['brush', 'Épaisseur du pinceau', 0.01, 0.15, 0.002], ['grain', 'Grain', 0.3, 2.5, 0.1], ['blend', 'Mélange des encres', 0, 1.5, 0.05]]],
+  ['Traits', [['strokes', 'Traits par kill', 0.5, 8, 0.1], ['brush', 'Épaisseur du pinceau', 0.01, 0.15, 0.002], ['grain', 'Grain', 0.3, 2.5, 0.1], ['blend', 'Mélange des encres', 0, 1.5, 0.05], ['dominance', 'Domination', 0, 4, 0.1]]],
   ['Champ de forces', [['noise', 'Ondulation', 0, 1.2, 0.01], ['noiseScale', 'Échelle des ondulations', 0.5, 6, 0.1], ['gravity', 'Gravité des rounds clés', 0, 2.5, 0.05], ['swirl', 'Tourbillon', 0, 2, 0.05], ['streakMin', 'Série minimale cassée', 3, 8, 1]]],
 ];
 const TOGGLES: [BooleanKey, string][] = [['showGrid', 'Grille chrono'], ['showBgData', 'Texte en fond'], ['showText', 'Texte'], ['showLines', 'Traits sans peinture (debug)']];

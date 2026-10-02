@@ -65,7 +65,19 @@ Chrome or `npx playwright install chromium`.
   `estimateMapKills()` spreads each team's total kills over rounds (winners get more).
 - Each stroke is a **straight horizontal line** starting at its kill: team 0 runs left, team 1
   right (as in the GenCup method, zehfernandes.com/posts/how-i-turned-world-cup-data-into-posters).
-  **Stroke length** ∝ team ADR share, **density** ∝ share of rounds won.
+  **Every stroke reaches its team's edge**: it runs until its *warped* point is past the frame by
+  `EDGE_MARGIN` (4% W), then a third longer (`TAPER_TAIL`) so its tapered end falls off-frame, capped by
+  `MAX_REACH`. The cut is on the warped point, not the straight one: cutting before `warp()` let the pull
+  and twist drag ends inward and left bare sides. Length therefore follows the kill's position; ADR is no
+  longer encoded (the `length` param is gone). **Density** ∝ share of rounds won.
+- **Domination** (`dominance`, slider "Domination", 0–4, default 2): `momentum()` (`match.ts`) gives each
+  round team 0's Gaussian-smoothed share of round wins (σ 1.5 rounds, per map). Each kill's stroke count is
+  scaled by `(2 × its team's momentum)^dominance`, weights normalised to mean 1 so total paint is unchanged.
+  A streak crushes the other team's strokes; alternating rounds weigh the same. In CS the round loser
+  still makes ~30% of the kills, so without this every stretch paints both teams evenly (football gets
+  domination for free: only the attacking side creates events). Stroke count uses random rounding with no
+  floor of 1, so a dominated team's kill can leave no stroke. 0 = no momentum, but not pixel-identical to
+  before (the rounding consumes `rnd`).
 - Then **one global warp** (`warp()`) moves every point of every stroke: a gentle low-frequency
   wave (`noise`), then per gravity well a bounded radial pull (`PULL_MAX` < 1, so lines converge
   but never fold) and a twist ∝ drama (`swirl`). Because the same smooth map bends all lines,

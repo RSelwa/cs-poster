@@ -1,5 +1,5 @@
 // Moteur de rendu du poster (Canvas 2D). Même code dans l'éditeur et dans le rendu headless du serveur.
-import { computeDrama, keyRounds, teamTotals } from './match.ts';
+import { computeDrama, keyRounds, momentum } from './match.ts';
 import { makeNoise, mulberry32 } from './noise.ts';
 import type { MapData, Match, Pair } from './types.ts';
 
@@ -10,10 +10,10 @@ export type Fonts = { serif: string; sans: string; mono: string };
 export type PosterParams = {
   seed: number; theme: Theme; colors: Pair<string>;
   cols: number; rows: number;
-  strokes: number; length: number; brush: number; grain: number;
+  strokes: number; brush: number; grain: number;
   noise: number; noiseScale: number;
   gravity: number; swirl: number; dramaAuto: boolean; drama: number; streakMin: number;
-  blend: number;
+  blend: number; dominance: number;
   showGrid: boolean; showBgData: boolean; bgText: BgText; showText: boolean; showLines: boolean;
 };
 
@@ -21,10 +21,10 @@ export const DEFAULTS: PosterParams = {
   seed: 7, theme: 'paper',
   colors: ['#e2452b', '#1f5fa8'],
   cols: 8, rows: 14,
-  strokes: 2.5, length: 0.7, brush: 0.02, grain: 1.0,
+  strokes: 2.5, brush: 0.02, grain: 1.0,
   noise: 0.3, noiseScale: 2.2,
   gravity: 1.0, swirl: 1.0, dramaAuto: true, drama: 0.5, streakMin: 4,
-  blend: 1.0,
+  blend: 1.0, dominance: 2.0,
   showGrid: false, showBgData: true, bgText: 'data', showText: true, showLines: false,
 };
 
@@ -138,12 +138,8 @@ export function renderPoster(ctx: CanvasRenderingContext2D, W: number, H: number
   }
 
   // métriques d'équipe
-  const tt = teamTotals(data);
   const wonShare = [data.teams[0].rounds, data.teams[1].rounds].map((s, _, a) => s / Math.max(1, a[0] + a[1]));
-  const adrSum = (tt[0].adr || 0) + (tt[1].adr || 0);
-  const adrShare = adrSum > 0 ? [(tt[0].adr || 0) / adrSum, (tt[1].adr || 0) / adrSum] : wonShare;
   const dens = wonShare.map((s) => Math.max(0.3, Math.min(2.2, Math.pow(s * 2, 1.6))));
-  const lenF = adrShare.map((s) => Math.pow(s * 2, 1.2));
   const drama = P.dramaAuto ? computeDrama(data) : P.drama;
 
   // points de gravité : seuls les rounds clés forts (fins de map, dernier round, longues séries cassées) courbent
@@ -185,6 +181,11 @@ export function renderPoster(ctx: CanvasRenderingContext2D, W: number, H: number
   })));
   // Budget : un BO3 a ~3× plus de kills qu'une map ; on réduit les traits par kill pour garder la même densité de peinture
   const budget = Math.min(1, 200 / Math.max(1, events.length));
+  // Domination : chaque kill pèse (2 × élan de son équipe)^dominance. Une série écrase l'autre équipe, des rounds
+  // alternés pèsent pareil. Les poids sont ramenés à une moyenne de 1 : la quantité de peinture ne change pas.
+  const mom = momentum(data);
+  const sway = events.map((ev) => Math.pow(2 * (ev.t === 0 ? mom[ev.round] : 1 - mom[ev.round]), P.dominance));
+  const swayMean = sway.reduce((a, b) => a + b, 0) / Math.max(1, sway.length) || 1;
 
   // Peinture « aérographe » : les traits ne sont pas dessinés. Chacun dépose de l'encre dans une grille
   // de densité par équipe (basse résolution, qui déborde du cadre), floutée ensuite à la largeur du pinceau :
@@ -223,20 +224,25 @@ export function renderPoster(ctx: CanvasRenderingContext2D, W: number, H: number
   }
 
   // Chaque kill lance des traits droits et horizontaux, vers la gauche pour l'équipe 0 et vers la droite pour l'équipe 1.
-  // Tous leurs points passent ensuite par warp().
-  const step = W * 0.0045;
+  // Tous leurs points passent ensuite par warp(). Un trait file jusqu'à ce que son point déformé sorte du cadre de son côté
+  // (de EDGE_MARGIN) : quelle que soit la déformation, les bords sont toujours couverts. Il continue encore d'un tiers
+  // (TAPER_TAIL) pour que l'amincissement de sa fin tombe hors du cadre. MAX_REACH borne la course.
+  const step = W * 0.0045, EDGE_MARGIN = 0.04, TAPER_TAIL = 1 / 3, MAX_REACH = 1.6;
+  const isPast = (x: number, dir: number) => (dir < 0 ? x < -W * EDGE_MARGIN : x > W * (1 + EDGE_MARGIN));
   const lines: { pts: number[][]; t: number }[] = [];
-  function emit(ev: KillEvent) {
+  function emit(ev: KillEvent, i: number) {
     const dir = ev.t === 0 ? -1 : 1;
-    const count = Math.max(1, Math.round(P.strokes * budget * dens[ev.t] * (0.7 + rnd() * 0.6)));
+    // arrondi aléatoire, sans minimum : un kill de l'équipe dominée peut ne laisser aucun trait
+    const count = Math.floor(P.strokes * budget * dens[ev.t] * (sway[i] / swayMean) * (0.7 + rnd() * 0.6) + rnd());
     for (let s = 0; s < count; s++) {
       const x0 = ev.x + (rnd() - 0.5) * cw * 0.5, y0 = ev.y + (rnd() - 0.5) * ch * 0.6;
-      const n = Math.max(4, Math.round((W * P.length * lenF[ev.t] * (0.55 + rnd() * 0.7)) / step));
       const pts: number[][] = [];
-      for (let i = 0; i <= n; i++) {
-        const x = x0 + dir * i * step;
-        if (x < -W * 0.1 || x > W * 1.1) break;
-        pts.push(warp(x, y0));
+      let exit = 0;
+      for (let x = x0; Math.abs(x - x0) < W * MAX_REACH; x += dir * step) {
+        const p = warp(x, y0);
+        pts.push(p);
+        if (!exit && isPast(p[0], dir)) exit = pts.length;
+        if (exit && pts.length >= exit * (1 + TAPER_TAIL)) break;
       }
       paintStroke(pts, ev.t);
       if (P.showLines) lines.push({ pts, t: ev.t });
