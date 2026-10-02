@@ -68,21 +68,6 @@ export async function renderPng(maps: MapData[], size = 2400) {
   }
 }
 
-// Pixels RGBA d'une image (logo, maillot) réduite à size × size : Chromium décode le webp, Node n'en est pas capable.
-export async function readPixels(image: Buffer, mime: string, size = 64) {
-  const page = await (await getBrowser()).newPage();
-  try {
-    return await page.evaluate(async ({ src, size }) => {
-      const img = new Image(); img.src = src; await img.decode();
-      const c = document.createElement('canvas'); c.width = size; c.height = size;
-      const ctx = c.getContext('2d')!; ctx.drawImage(img, 0, 0, size, size);
-      return Array.from(ctx.getImageData(0, 0, size, size).data);
-    }, { src: `data:${mime};base64,${image.toString('base64')}`, size });
-  } finally {
-    await page.close().catch(() => {});
-  }
-}
-
 export async function closeRenderer() {
   if (browserPromise) await (await browserPromise).close().catch(() => {});
   browserPromise = null;

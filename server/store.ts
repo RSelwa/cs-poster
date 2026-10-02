@@ -4,7 +4,6 @@
 //   data/matches/<slug>.json   maps d'un match terminé et entièrement parsé (ne change plus)
 //   data/posters/<nom>.png     posters rendus par le watcher
 //   data/posters.json          index des posters, par identifiant de match bo3.gg
-//   data/teams.json            couleur extraite de chaque équipe, par identifiant d'équipe bo3.gg
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -15,12 +14,9 @@ const DATA_DIR = path.join(ROOT, 'data');
 const MATCHES_DIR = path.join(DATA_DIR, 'matches');
 export const POSTERS_DIR = path.join(DATA_DIR, 'posters');
 const POSTERS_INDEX = path.join(DATA_DIR, 'posters.json');
-const TEAMS_INDEX = path.join(DATA_DIR, 'teams.json');
 
 export const SLUG = /^[a-z0-9][a-z0-9-]*$/i;
 
-// images : les urls d'où la couleur a été extraite (un nouveau logo relance l'extraction)
-export type TeamColorRecord = { slug: string; images: string; color: string | null };
 export type PosterRecord = { matchId: number; slug: string; file: string; drama: number; size: number; at: string };
 
 const matchFile = (slug: string) => {
@@ -50,13 +46,4 @@ export async function savePoster(record: Omit<PosterRecord, 'file' | 'at'>, png:
   index[record.matchId] = saved;
   await fs.writeFile(POSTERS_INDEX, JSON.stringify(index, null, 2));
   return saved;
-}
-
-export const getTeamColors = () => readJson<Record<string, TeamColorRecord>>(TEAMS_INDEX, {});
-
-export async function saveTeamColor(teamId: number, record: TeamColorRecord) {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-  const index = await getTeamColors();
-  index[teamId] = record;
-  await fs.writeFile(TEAMS_INDEX, JSON.stringify(index, null, 2));
 }

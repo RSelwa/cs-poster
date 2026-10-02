@@ -36,7 +36,7 @@ export async function loadMatch(slug: string): Promise<MatchMaps> {
   if (cached) return { ready: true, maps: cached };
   const r = await fetchMatch(slug);
   if (!r.ready) return { ready: false, reason: r.reason };
-  const colors = await teamColors([r.match.team1, r.match.team2]);
+  const colors = teamColors([r.match.team1, r.match.team2]);
   const maps = r.maps.map((m) => ({ ...m, teams: m.teams.map((t, i) => (colors[i] ? { ...t, color: colors[i] } : t)) as MapData['teams'] }));
   await saveMaps(slug, maps);
   return { ready: true, maps };
