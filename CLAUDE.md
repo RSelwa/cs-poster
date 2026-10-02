@@ -59,7 +59,7 @@ Chrome or `npx playwright install chromium`.
 ## Renderer model (`renderPoster`)
 
 - A `cols × rows` grid maps chronological time: slot 0 = first round of map 1, last slot = last
-  round of last map.
+  round of last map. The grid covers the whole sheet, no margin (`mx` is only the text margin).
 - Each **kill** is an event → spawns strokes. If rounds carry `kills: [{team, t?}]` (bo3.gg data
   does, without `t`), they are used as-is and a missing `t` is drawn from `rnd`. Otherwise
   `estimateMapKills()` spreads each team's total kills over rounds (winners get more).

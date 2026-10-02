@@ -106,14 +106,13 @@ export function renderPoster(ctx: CanvasRenderingContext2D, W: number, H: number
   ctx.globalCompositeOperation = 'source-over';
   ctx.fillStyle = T.bg; ctx.fillRect(0, 0, W, H);
 
-  // grille chrono
-  const mx = W * 0.075, top = H * 0.135, bottom = H * 0.135;
-  const gx = mx, gy = top, gw = W - mx * 2, gh = H - top - bottom;
+  // grille chrono : toute la feuille, sans marge (mx ne sert qu'au texte)
+  const mx = W * 0.075;
   const rows = Math.max(2, Math.round(P.rows)), totalSlots = rows * P.cols;
-  const cw = gw / P.cols, ch = gh / rows;
+  const cw = W / P.cols, ch = H / rows;
   // position (round, fraction du round) → case de la grille → point
   const slotOf = (ri: number, tm: number) => Math.min(totalSlots - 1, Math.floor(((ri + tm) / Math.max(1, nR)) * totalSlots));
-  const slotPos = (slot: number, jx = 0.5, jy = 0.5) => [gx + ((slot % P.cols) + jx) * cw, gy + (Math.floor(slot / P.cols) + jy) * ch];
+  const slotPos = (slot: number, jx = 0.5, jy = 0.5) => [((slot % P.cols) + jx) * cw, (Math.floor(slot / P.cols) + jy) * ch];
 
   // fond de texte : les données du match en JSON, ou les pseudos des joueurs répétés
   if (P.showBgData) {
@@ -132,8 +131,8 @@ export function renderPoster(ctx: CanvasRenderingContext2D, W: number, H: number
   // grille visible
   if (P.showGrid) {
     ctx.strokeStyle = T.ink; ctx.globalAlpha = 0.10; ctx.lineWidth = Math.max(1, W / 1500);
-    for (let c = 0; c <= P.cols; c++) { ctx.beginPath(); ctx.moveTo(gx + c * cw, gy); ctx.lineTo(gx + c * cw, gy + gh); ctx.stroke(); }
-    for (let r = 0; r <= rows; r++) { ctx.beginPath(); ctx.moveTo(gx, gy + r * ch); ctx.lineTo(gx + gw, gy + r * ch); ctx.stroke(); }
+    for (let c = 0; c <= P.cols; c++) { ctx.beginPath(); ctx.moveTo(c * cw, 0); ctx.lineTo(c * cw, H); ctx.stroke(); }
+    for (let r = 0; r <= rows; r++) { ctx.beginPath(); ctx.moveTo(0, r * ch); ctx.lineTo(W, r * ch); ctx.stroke(); }
     ctx.globalAlpha = 1;
   }
 
