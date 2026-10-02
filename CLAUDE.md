@@ -102,6 +102,9 @@ Chrome or `npx playwright install chromium`.
      specks, from the `rp` stream.
   The composite goes through `getImageData` / `putImageData`, so it overwrites nothing drawn
   after it: background text and grid are painted before, flecks and typography after.
+- **Debug lines** (`showLines`, switch "Traits sans peinture (debug)"): the warped strokes drawn as thin
+  team-colored lines on bare paper, no blur / composite / flecks. Strokes still go through `paintStroke`, so
+  `rnd` is consumed the same way: the lines are exactly the geometry of the painted poster for that seed.
 - Visual reference: gencup.art posters (e.g. `~/Downloads/10-ned.jpg`: final + debug view).
 - Cost: ~200 ms at 480 px, ~340 ms at 1000 px, ~1.9 s at 3540 px export. The per-pixel
   composite dominates at export size.

@@ -14,7 +14,7 @@ export type PosterParams = {
   noise: number; noiseScale: number;
   gravity: number; swirl: number; dramaAuto: boolean; drama: number; streakMin: number;
   blend: number;
-  showGrid: boolean; showBgData: boolean; bgText: BgText; showText: boolean;
+  showGrid: boolean; showBgData: boolean; bgText: BgText; showText: boolean; showLines: boolean;
 };
 
 export const DEFAULTS: PosterParams = {
@@ -25,7 +25,7 @@ export const DEFAULTS: PosterParams = {
   noise: 0.3, noiseScale: 2.2,
   gravity: 1.0, swirl: 1.0, dramaAuto: true, drama: 0.5, streakMin: 4,
   blend: 1.0,
-  showGrid: false, showBgData: true, bgText: 'data', showText: true,
+  showGrid: false, showBgData: true, bgText: 'data', showText: true, showLines: false,
 };
 
 // palette par défaut, stable pour un nom d'équipe (mêmes couleurs dans l'éditeur et dans le rendu headless)
@@ -225,6 +225,7 @@ export function renderPoster(ctx: CanvasRenderingContext2D, W: number, H: number
   // Chaque kill lance des traits droits et horizontaux, vers la gauche pour l'équipe 0 et vers la droite pour l'équipe 1.
   // Tous leurs points passent ensuite par warp().
   const step = W * 0.0045;
+  const lines: { pts: number[][]; t: number }[] = [];
   function emit(ev: KillEvent) {
     const dir = ev.t === 0 ? -1 : 1;
     const count = Math.max(1, Math.round(P.strokes * budget * dens[ev.t] * (0.7 + rnd() * 0.6)));
@@ -238,111 +239,123 @@ export function renderPoster(ctx: CanvasRenderingContext2D, W: number, H: number
         pts.push(warp(x, y0));
       }
       paintStroke(pts, ev.t);
+      if (P.showLines) lines.push({ pts, t: ev.t });
     }
   }
   events.forEach(emit);
 
-  // Flou : 3 passes de flou boîte ≈ gaussienne. Deux échelles : le halo large du pinceau + un cœur plus net.
-  const box1d = (src: Float32Array, dst: Float32Array, n: number, lines: number, along: number, across: number, r: number) => {
-    const k = 1 / (2 * r + 1);
-    for (let l = 0; l < lines; l++) {
-      const base = l * across;
-      let s = 0;
-      for (let i = 0; i <= r && i < n; i++) s += src[base + i * along];
-      for (let i = 0; i < n; i++) {
-        dst[base + i * along] = s * k;
-        if (i + r + 1 < n) s += src[base + (i + r + 1) * along];
-        if (i - r >= 0) s -= src[base + (i - r) * along];
+  // Mode debug : les traits après warp(), en lignes fines, sans peinture (même tirage que le poster peint).
+  if (P.showLines) {
+    ctx.lineWidth = Math.max(1, W * 0.0012); ctx.globalAlpha = 0.6;
+    lines.forEach(({ pts, t }) => {
+      ctx.strokeStyle = tc[t]; ctx.beginPath();
+      pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+      ctx.stroke();
+    });
+    ctx.globalAlpha = 1;
+  } else {
+    // Flou : 3 passes de flou boîte ≈ gaussienne. Deux échelles : le halo large du pinceau + un cœur plus net.
+    const box1d = (src: Float32Array, dst: Float32Array, n: number, lines: number, along: number, across: number, r: number) => {
+      const k = 1 / (2 * r + 1);
+      for (let l = 0; l < lines; l++) {
+        const base = l * across;
+        let s = 0;
+        for (let i = 0; i <= r && i < n; i++) s += src[base + i * along];
+        for (let i = 0; i < n; i++) {
+          dst[base + i * along] = s * k;
+          if (i + r + 1 < n) s += src[base + (i + r + 1) * along];
+          if (i - r >= 0) s -= src[base + (i - r) * along];
+        }
+      }
+    };
+    const blur = (src: Float32Array, sigma: number) => {
+      const r = Math.max(1, Math.round((Math.sqrt(4 * sigma * sigma + 1) - 1) / 2));
+      const a = Float32Array.from(src), b = new Float32Array(src.length);
+      for (let p = 0; p < 3; p++) { box1d(a, b, dw, dh, 1, dw, r); box1d(b, a, dh, dw, dw, 1, r); }
+      return a;
+    };
+    const fields = ink.map((g) => blur(g, (brushPx * 0.3 + W * 0.035) / cell));
+
+    // Référence de densité : le 98e centile. Les zones les plus chargées approchent MAX_INK sans jamais être pleines.
+    const sample: number[] = [];
+    fields.forEach((f) => { for (let i = 0; i < f.length; i += 7) if (f[i] > 1e-6) sample.push(f[i]); });
+    sample.sort((a, b) => a - b);
+    const ref = sample.length ? sample[Math.floor(sample.length * 0.98)] : 1;
+
+    // Encres translucides superposées comme au pochoir : chaque équipe multiplie le papier (ou l'éclaircit en « écran »).
+    // Deux encres partielles donnent une troisième couleur (orange × bleu → vert, rouge × bleu → mauve) au lieu d'un noir.
+    // Spray : chaque grain tire sa propre densité autour de la couverture (écart max à mi-couverture, nul sur papier nu),
+    // et le papier lui-même est légèrement moucheté. Le bruit est surtout commun aux deux équipes (SHARED_GRAIN) :
+    // sinon, là où elles se chevauchent, des grains pleins des deux encres se multiplient en points noirs.
+    const COVER_GAIN = 3.2, MAX_INK = 0.88, SPRAY = 0.45, PAPER_NOISE = 0.035, SHARED_GRAIN = 0.7;
+    const gs = Math.max(1, Math.round((W / 1000) * P.grain));
+    const img = ctx.getImageData(0, 0, W, H), px = img.data;
+    const cols = Math.ceil(W / gs), grain = [new Float32Array(cols), new Float32Array(cols), new Float32Array(cols)];
+    const fxs = new Float32Array(W).map((_, x) => (x + 0.5) / cell + pad);
+    const inkF = inkRGB.map((c) => c.map((v) => v / 255));
+    const screen = T.blend === 'screen';
+    const alpha = [0, 0], mul = [0, 0, 0], mix = [0, 0, 0];
+    const LUMA = [0.299, 0.587, 0.114], OVERLAP_LIFT = 0.8, OVERLAP_SAT = 1.2;
+    for (let y = 0; y < H; y++) {
+      if (y % gs === 0) grain.forEach((row) => { for (let c = 0; c < cols; c++) row[c] = rp() * 2 - 1; });
+      const fy = (y + 0.5) / cell + pad, iy = Math.floor(fy), ay = fy - iy, o0 = iy * dw, o1 = o0 + dw;
+      for (let x = 0; x < W; x++) {
+        const fx = fxs[x], ix = Math.floor(fx), ax = fx - ix, p = (y * W + x) * 4, gc = (x / gs) | 0;
+        for (let t = 0; t < 2; t++) {
+          const f = fields[t];
+          const d = (f[o0 + ix] * (1 - ax) + f[o0 + ix + 1] * ax) * (1 - ay) + (f[o1 + ix] * (1 - ax) + f[o1 + ix + 1] * ax) * ay;
+          const cover = d > 0 ? MAX_INK * (1 - Math.exp((-COVER_GAIN * d) / ref)) : 0;
+          const n = SHARED_GRAIN * grain[2][gc] + (1 - SHARED_GRAIN) * grain[t][gc];
+          alpha[t] = Math.max(0, Math.min(1, cover + SPRAY * n * Math.sqrt(cover * (1 - cover))));
+        }
+        const lum = 1 + PAPER_NOISE * grain[2][gc];
+        const [a0, a1] = alpha;
+        if (screen) {
+          for (let k = 0; k < 3; k++) px[p + k] = (255 - (255 - px[p + k]) * (1 - a0 * inkF[0][k]) * (1 - a1 * inkF[1][k])) * lum;
+          continue;
+        }
+        // Le produit des deux encres donne la teinte du mélange (orange × bleu → vert) mais l'assombrit trop :
+        // on lui rend en partie la clarté d'un simple mélange de peinture (moyenne des encres pondérée par leur couverture),
+        // et un peu de saturation là où les deux couvrent.
+        const a = 1 - (1 - a0) * (1 - a1);
+        let lMul = 0, lMix = 0;
+        for (let k = 0; k < 3; k++) {
+          const bg = px[p + k];
+          mul[k] = bg * (1 - a0 * (1 - inkF[0][k])) * (1 - a1 * (1 - inkF[1][k]));
+          const c = a > 0 ? (a0 * inkF[0][k] + a1 * inkF[1][k]) / (a0 + a1) : 1;
+          mix[k] = bg * (1 - a + a * c);
+          lMul += LUMA[k] * mul[k]; lMix += LUMA[k] * mix[k];
+        }
+        const lift = lMul > 0 ? Math.pow(lMix / lMul, OVERLAP_LIFT) : 1, sat = 1 + OVERLAP_SAT * Math.min(a0, a1);
+        // P.blend dose l'effet : 0 = simple mélange de peinture, 1 = mélange soustractif ci-dessus, au-delà = accentué.
+        for (let k = 0; k < 3; k++) {
+          const blended = (lMul + (mul[k] - lMul) * sat) * lift;
+          px[p + k] = Math.max(0, Math.min(255, mix[k] + (blended - mix[k]) * P.blend)) * lum;
+        }
       }
     }
-  };
-  const blur = (src: Float32Array, sigma: number) => {
-    const r = Math.max(1, Math.round((Math.sqrt(4 * sigma * sigma + 1) - 1) / 2));
-    const a = Float32Array.from(src), b = new Float32Array(src.length);
-    for (let p = 0; p < 3; p++) { box1d(a, b, dw, dh, 1, dw, r); box1d(b, a, dh, dw, dw, 1, r); }
-    return a;
-  };
-  const fields = ink.map((g) => blur(g, (brushPx * 0.3 + W * 0.035) / cell));
+    ctx.putImageData(img, 0, 0);
 
-  // Référence de densité : le 98e centile. Les zones les plus chargées approchent MAX_INK sans jamais être pleines.
-  const sample: number[] = [];
-  fields.forEach((f) => { for (let i = 0; i < f.length; i += 7) if (f[i] > 1e-6) sample.push(f[i]); });
-  sample.sort((a, b) => a - b);
-  const ref = sample.length ? sample[Math.floor(sample.length * 0.98)] : 1;
-
-  // Encres translucides superposées comme au pochoir : chaque équipe multiplie le papier (ou l'éclaircit en « écran »).
-  // Deux encres partielles donnent une troisième couleur (orange × bleu → vert, rouge × bleu → mauve) au lieu d'un noir.
-  // Spray : chaque grain tire sa propre densité autour de la couverture (écart max à mi-couverture, nul sur papier nu),
-  // et le papier lui-même est légèrement moucheté. Le bruit est surtout commun aux deux équipes (SHARED_GRAIN) :
-  // sinon, là où elles se chevauchent, des grains pleins des deux encres se multiplient en points noirs.
-  const COVER_GAIN = 3.2, MAX_INK = 0.88, SPRAY = 0.45, PAPER_NOISE = 0.035, SHARED_GRAIN = 0.7;
-  const gs = Math.max(1, Math.round((W / 1000) * P.grain));
-  const img = ctx.getImageData(0, 0, W, H), px = img.data;
-  const cols = Math.ceil(W / gs), grain = [new Float32Array(cols), new Float32Array(cols), new Float32Array(cols)];
-  const fxs = new Float32Array(W).map((_, x) => (x + 0.5) / cell + pad);
-  const inkF = inkRGB.map((c) => c.map((v) => v / 255));
-  const screen = T.blend === 'screen';
-  const alpha = [0, 0], mul = [0, 0, 0], mix = [0, 0, 0];
-  const LUMA = [0.299, 0.587, 0.114], OVERLAP_LIFT = 0.8, OVERLAP_SAT = 1.2;
-  for (let y = 0; y < H; y++) {
-    if (y % gs === 0) grain.forEach((row) => { for (let c = 0; c < cols; c++) row[c] = rp() * 2 - 1; });
-    const fy = (y + 0.5) / cell + pad, iy = Math.floor(fy), ay = fy - iy, o0 = iy * dw, o1 = o0 + dw;
-    for (let x = 0; x < W; x++) {
-      const fx = fxs[x], ix = Math.floor(fx), ax = fx - ix, p = (y * W + x) * 4, gc = (x / gs) | 0;
-      for (let t = 0; t < 2; t++) {
-        const f = fields[t];
-        const d = (f[o0 + ix] * (1 - ax) + f[o0 + ix + 1] * ax) * (1 - ay) + (f[o1 + ix] * (1 - ax) + f[o1 + ix + 1] * ax) * ay;
-        const cover = d > 0 ? MAX_INK * (1 - Math.exp((-COVER_GAIN * d) / ref)) : 0;
-        const n = SHARED_GRAIN * grain[2][gc] + (1 - SHARED_GRAIN) * grain[t][gc];
-        alpha[t] = Math.max(0, Math.min(1, cover + SPRAY * n * Math.sqrt(cover * (1 - cover))));
-      }
-      const lum = 1 + PAPER_NOISE * grain[2][gc];
-      const [a0, a1] = alpha;
-      if (screen) {
-        for (let k = 0; k < 3; k++) px[p + k] = (255 - (255 - px[p + k]) * (1 - a0 * inkF[0][k]) * (1 - a1 * inkF[1][k])) * lum;
-        continue;
-      }
-      // Le produit des deux encres donne la teinte du mélange (orange × bleu → vert) mais l'assombrit trop :
-      // on lui rend en partie la clarté d'un simple mélange de peinture (moyenne des encres pondérée par leur couverture),
-      // et un peu de saturation là où les deux couvrent.
-      const a = 1 - (1 - a0) * (1 - a1);
-      let lMul = 0, lMix = 0;
-      for (let k = 0; k < 3; k++) {
-        const bg = px[p + k];
-        mul[k] = bg * (1 - a0 * (1 - inkF[0][k])) * (1 - a1 * (1 - inkF[1][k]));
-        const c = a > 0 ? (a0 * inkF[0][k] + a1 * inkF[1][k]) / (a0 + a1) : 1;
-        mix[k] = bg * (1 - a + a * c);
-        lMul += LUMA[k] * mul[k]; lMix += LUMA[k] * mix[k];
-      }
-      const lift = lMul > 0 ? Math.pow(lMix / lMul, OVERLAP_LIFT) : 1, sat = 1 + OVERLAP_SAT * Math.min(a0, a1);
-      // P.blend dose l'effet : 0 = simple mélange de peinture, 1 = mélange soustractif ci-dessus, au-delà = accentué.
-      for (let k = 0; k < 3; k++) {
-        const blended = (lMul + (mul[k] - lMul) * sat) * lift;
-        px[p + k] = Math.max(0, Math.min(255, mix[k] + (blended - mix[k]) * P.blend)) * lum;
-      }
+    // Mouchetures : de courts tirets sombres posés sur une partie des kills, plus une poussière de points au hasard.
+    const FLECKS = 70, DUST = 320;
+    const pFleck = Math.min(1, FLECKS / Math.max(1, events.length));
+    const fleckInk = (t: number) => (screen ? T.ink : `rgb(${inkRGB[t].map((v) => Math.round(v * 0.45)).join(',')})`);
+    ctx.lineCap = 'round'; ctx.lineWidth = Math.max(1, W * 0.0011);
+    events.forEach((ev) => {
+      if (rp() > pFleck) return;
+      const len = W * (0.003 + rp() * 0.006), ang = Math.PI * (0.5 + (rp() - 0.5) * 0.9);
+      const x = ev.x + (rp() - 0.5) * cw, y = ev.y + (rp() - 0.5) * ch;
+      const dx = (Math.cos(ang) * len) / 2, dy = (Math.sin(ang) * len) / 2;
+      ctx.strokeStyle = rp() < 0.35 ? fleckInk(ev.t) : T.ink; ctx.globalAlpha = 0.4 + rp() * 0.4;
+      ctx.beginPath(); ctx.moveTo(x - dx, y - dy); ctx.lineTo(x + dx, y + dy); ctx.stroke();
+    });
+    for (let i = 0; i < DUST; i++) {
+      const s = W * (0.0007 + rp() * 0.0013);
+      ctx.fillStyle = rp() < 0.5 ? T.ink : fleckInk(rp() < 0.5 ? 0 : 1); ctx.globalAlpha = 0.2 + rp() * 0.4;
+      ctx.fillRect(rp() * W, rp() * H, s, s);
     }
+    ctx.globalAlpha = 1;
   }
-  ctx.putImageData(img, 0, 0);
-
-  // Mouchetures : de courts tirets sombres posés sur une partie des kills, plus une poussière de points au hasard.
-  const FLECKS = 70, DUST = 320;
-  const pFleck = Math.min(1, FLECKS / Math.max(1, events.length));
-  const fleckInk = (t: number) => (screen ? T.ink : `rgb(${inkRGB[t].map((v) => Math.round(v * 0.45)).join(',')})`);
-  ctx.lineCap = 'round'; ctx.lineWidth = Math.max(1, W * 0.0011);
-  events.forEach((ev) => {
-    if (rp() > pFleck) return;
-    const len = W * (0.003 + rp() * 0.006), ang = Math.PI * (0.5 + (rp() - 0.5) * 0.9);
-    const x = ev.x + (rp() - 0.5) * cw, y = ev.y + (rp() - 0.5) * ch;
-    const dx = (Math.cos(ang) * len) / 2, dy = (Math.sin(ang) * len) / 2;
-    ctx.strokeStyle = rp() < 0.35 ? fleckInk(ev.t) : T.ink; ctx.globalAlpha = 0.4 + rp() * 0.4;
-    ctx.beginPath(); ctx.moveTo(x - dx, y - dy); ctx.lineTo(x + dx, y + dy); ctx.stroke();
-  });
-  for (let i = 0; i < DUST; i++) {
-    const s = W * (0.0007 + rp() * 0.0013);
-    ctx.fillStyle = rp() < 0.5 ? T.ink : fleckInk(rp() < 0.5 ? 0 : 1); ctx.globalAlpha = 0.2 + rp() * 0.4;
-    ctx.fillRect(rp() * W, rp() * H, s, s);
-  }
-  ctx.globalAlpha = 1;
 
   // typographie
   if (P.showText) {

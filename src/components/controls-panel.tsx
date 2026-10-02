@@ -16,7 +16,7 @@ import type { Match } from '@/core/types.ts';
 import { download } from '@/lib/download.ts';
 
 type NumericKey = { [K in keyof PosterParams]: PosterParams[K] extends number ? K : never }[keyof PosterParams];
-type BooleanKey = 'showGrid' | 'showBgData' | 'showText';
+type BooleanKey = 'showGrid' | 'showBgData' | 'showText' | 'showLines';
 type SliderDef = [NumericKey, string, number, number, number];
 
 const SLIDERS: [string, SliderDef[]][] = [
@@ -24,7 +24,7 @@ const SLIDERS: [string, SliderDef[]][] = [
   ['Traits', [['strokes', 'Traits par kill', 0.5, 8, 0.1], ['length', 'Longueur', 0.1, 1.2, 0.01], ['brush', 'Épaisseur du pinceau', 0.01, 0.15, 0.002], ['grain', 'Grain', 0.3, 2.5, 0.1], ['blend', 'Mélange des encres', 0, 1.5, 0.05]]],
   ['Champ de forces', [['noise', 'Ondulation', 0, 1.2, 0.01], ['noiseScale', 'Échelle des ondulations', 0.5, 6, 0.1], ['gravity', 'Gravité des rounds clés', 0, 2.5, 0.05], ['swirl', 'Tourbillon', 0, 2, 0.05], ['streakMin', 'Série minimale cassée', 3, 8, 1]]],
 ];
-const TOGGLES: [BooleanKey, string][] = [['showGrid', 'Grille chrono'], ['showBgData', 'Texte en fond'], ['showText', 'Texte']];
+const TOGGLES: [BooleanKey, string][] = [['showGrid', 'Grille chrono'], ['showBgData', 'Texte en fond'], ['showText', 'Texte'], ['showLines', 'Traits sans peinture (debug)']];
 const BG_TEXTS: [BgText, string][] = [['data', 'Données'], ['players', 'Joueurs']];
 const EXPORT_SIZES = [['1800', '1800 × 2400 px (écran)'], ['3000', '3000 × 4000 px'], ['3540', '3540 × 4720 px (30 × 40 cm, 300 dpi)']];
 const MAX_SEED = 9999;
