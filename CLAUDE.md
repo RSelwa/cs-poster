@@ -43,7 +43,7 @@ Chrome or `npx playwright install chromium`.
 | `server/render.ts` | bundles `src/core/index.ts` once with Vite's `build()` (IIFE, `window.PosterCore`, `write: false`), headless Chromium draws it with Google Fonts + `LOCAL_FONTS` (embedded as `data:`), `DEFAULTS` + `defaultColors` → PNG buffer |
 | `server/team-colors.ts` + `team-colors.json` | team colors hand-picked per bo3 team id: `{ id, name, primary, secondary }`, top 50 of the bo3 ranking. `loadMatch` writes `primary` into `MapTeam.color` before caching the match; a team absent from the file gets `null` → palette. `secondary` is not read yet (planned: clash fallback) |
 | `server/store.ts` | **the persistence boundary**, today files in `data/` (gitignored): `data/matches/<slug>.json` (maps of a fully parsed match, immutable), `data/posters/<slug>.png` and `data/posters.json` (index by bo3 match id). Swap this module for the DB |
-| `ecosystem.config.cjs` + `.github/workflows/deploy.yml` | VPS deploy: push on `main` → SSH, `git reset --hard`, install, build, `pm2 startOrReload` (app `cs-posters`, :4173), nginx site in `deploy/` for `cs-poster.raphael-selwa.com`. Setup and GitHub vars in README « Déployer » |
+| `ecosystem.config.cjs` + `.github/workflows/deploy.yml` | VPS deploy: push on `main` → SSH, `git reset --hard`, install, build, `pm2 startOrReload` (app `cs-posters`, :4173), served on `cs-poster.raphael-selwa.com`. Setup and GitHub vars in README « Déployer » |
 | `fixtures/` | fake tier-1 matches as import JSON (`{ version: 2, label, maps }`, `source: "fake"`, events suffixed "(fictif)"). `pnpm fixtures` regenerates them deterministically; scenarios are in `generate.mjs` → `MATCHES` |
 
 ## Data flow

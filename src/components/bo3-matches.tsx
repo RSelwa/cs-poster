@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ImageIcon, RefreshCw } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,11 @@ import { fetchMatches, fetchMatchMaps } from '@/lib/api.ts';
 import type { MatchSummary } from '@/lib/api-types.ts';
 
 type Props = { onLoad: (maps: MapData[], message: string) => void; onStatus: (message: string, error?: boolean) => void };
+
+// À l'arrivée, nombre de matchs essayés (ceux avec un poster d'abord : déjà en cache) avant de garder la démo.
+const AUTO_LOAD_TRIES = 3;
+
+const loadedMessage = (m: MatchSummary, maps: number) => `Match chargé : ${m.teams[0].name} ${m.teams[0].score}–${m.teams[1].score} ${m.teams[1].name}, ${maps} map${maps > 1 ? 's' : ''}.`;
 
 const formatEnd = (iso: string | null) => (iso ? new Date(iso).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '');
 
@@ -19,6 +24,7 @@ export const Bo3Matches = ({ onLoad, onStatus }: Props) => {
   const [loadingSlug, setLoadingSlug] = useState<string | null>(null);
 
   const [reload, setReload] = useState(0);
+  const autoLoaded = useRef(false);
 
   useEffect(() => {
     let alive = true;
@@ -33,6 +39,20 @@ export const Bo3Matches = ({ onLoad, onStatus }: Props) => {
     return () => { alive = false; };
   }, [reload]);
 
+  // Une seule fois, à l'arrivée : charge le match le plus récent disponible, à la place de la démo.
+  useEffect(() => {
+    if (autoLoaded.current || !matches.length) return;
+    autoLoaded.current = true;
+    const run = async () => {
+      const candidates = [...matches.filter((m) => m.poster), ...matches.filter((m) => !m.poster)].slice(0, AUTO_LOAD_TRIES);
+      for (const m of candidates) {
+        const r = await fetchMatchMaps(m.slug).catch(() => null);
+        if (r?.ready) return onLoad(r.maps, loadedMessage(m, r.maps.length));
+      }
+    };
+    run();
+  }, [matches, onLoad]);
+
   const refresh = () => { setRefreshing(true); setReload((n) => n + 1); };
 
   const load = async (m: MatchSummary) => {
@@ -40,7 +60,7 @@ export const Bo3Matches = ({ onLoad, onStatus }: Props) => {
     onStatus(`Récupération de ${m.teams[0].name} – ${m.teams[1].name}…`);
     try {
       const r = await fetchMatchMaps(m.slug);
-      if (r.ready) onLoad(r.maps, `Match chargé : ${m.teams[0].name} ${m.teams[0].score}–${m.teams[1].score} ${m.teams[1].name}, ${r.maps.length} map${r.maps.length > 1 ? 's' : ''}.`);
+      if (r.ready) onLoad(r.maps, loadedMessage(m, r.maps.length));
       else onStatus(`Pas encore disponible : ${r.reason}. bo3.gg publie les rounds 10 à 20 min après la fin.`, true);
     } catch (err) { onStatus((err as Error).message, true); }
     setLoadingSlug(null);
