@@ -8,9 +8,9 @@ export type LocalFont = { family: string; file: string; weight?: string; style?:
 
 export const LOCAL_FONTS: LocalFont[] = [];
 
-export const FONTS_CSS = 'https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Familjen+Grotesk:wght@400;500;600&family=DM+Mono&display=swap';
+export const FONTS_CSS = 'https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono&display=swap';
 export const FONTS: Fonts = { serif: "'Instrument Serif', Georgia, serif", sans: "'Familjen Grotesk', system-ui, sans-serif", mono: "'DM Mono', ui-monospace, monospace" };
-export const FONT_FACES = ['1em "Instrument Serif"', '500 1em "Familjen Grotesk"', '600 1em "Familjen Grotesk"', '1em "DM Mono"', ...LOCAL_FONTS.map((f) => `${f.style || 'normal'} ${(f.weight || '400').split(' ')[0]} 1em "${f.family}"`)];
+export const FONT_FACES = ['1em "Instrument Serif"', '500 1em "Familjen Grotesk"', '600 1em "Familjen Grotesk"', '700 1em "Familjen Grotesk"', '1em "DM Mono"', ...LOCAL_FONTS.map((f) => `${f.style || 'normal'} ${(f.weight || '400').split(' ')[0]} 1em "${f.family}"`)];
 
 // src : l'url du fichier (/fonts/… dans l'éditeur, data: dans le rendu headless)
 export const fontFaceCss = (f: LocalFont, src: string) => `@font-face{font-family:"${f.family}";src:url("${src}");font-weight:${f.weight || '400'};font-style:${f.style || 'normal'};font-display:block}`;

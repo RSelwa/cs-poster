@@ -13,8 +13,8 @@ export type PosterParams = {
   strokes: number; brush: number; grain: number;
   noise: number; noiseScale: number;
   gravity: number; swirl: number; dramaAuto: boolean; drama: number; streakMin: number;
-  blend: number; dominance: number;
-  showGrid: boolean; showBgData: boolean; bgText: BgText; showText: boolean; showLines: boolean;
+  blend: number; dominance: number; mapScoreSize: number;
+  showGrid: boolean; showBgData: boolean; bgText: BgText; showText: boolean; showLines: boolean; showMapScores: boolean;
 };
 
 export const DEFAULTS: PosterParams = {
@@ -24,8 +24,8 @@ export const DEFAULTS: PosterParams = {
   strokes: 2.5, brush: 0.02, grain: 1.0,
   noise: 0.3, noiseScale: 2.2,
   gravity: 1.0, swirl: 1.0, dramaAuto: true, drama: 0.5, streakMin: 4,
-  blend: 1.0, dominance: 2.0,
-  showGrid: false, showBgData: true, bgText: 'data', showText: true, showLines: false,
+  blend: 1.0, dominance: 2.0, mapScoreSize: 0.005,
+  showGrid: false, showBgData: true, bgText: 'data', showText: true, showLines: false, showMapScores: true,
 };
 
 // palette par défaut, stable pour un nom d'équipe (mêmes couleurs dans l'éditeur et dans le rendu headless)
@@ -50,8 +50,6 @@ export const THEMES = {
   paper: { bg: '#efe9dc', ink: '#1b1a17', blend: 'multiply', dataAlpha: 0.10 },
   ink: { bg: '#121417', ink: '#ece8de', blend: 'screen', dataAlpha: 0.12 },
 } as const;
-
-const SOURCE_LABEL: Record<string, string> = { bo3: 'bo3.gg', hltv: 'hltv', fake: 'fictif', demo: 'démo' };
 
 function hex2rgb(h: string) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
 
@@ -106,8 +104,7 @@ export function renderPoster(ctx: CanvasRenderingContext2D, W: number, H: number
   ctx.globalCompositeOperation = 'source-over';
   ctx.fillStyle = T.bg; ctx.fillRect(0, 0, W, H);
 
-  // grille chrono : toute la feuille, sans marge (mx ne sert qu'au texte)
-  const mx = W * 0.075;
+  // grille chrono : toute la feuille, sans marge
   const rows = Math.max(2, Math.round(P.rows)), totalSlots = rows * P.cols;
   const cw = W / P.cols, ch = H / rows;
   // position (round, fraction du round) → case de la grille → point
@@ -362,35 +359,48 @@ export function renderPoster(ctx: CanvasRenderingContext2D, W: number, H: number
     ctx.globalAlpha = 1;
   }
 
-  // typographie
+  // Étiquette en bas à droite, seul texte du poster : équipes et score, puis une boîte « #match | jour mois / année ».
   if (P.showText) {
-    ctx.textBaseline = 'alphabetic';
-    ctx.fillStyle = T.ink;
-    const small = W * 0.0135;
-    ctx.font = `500 ${small}px ${F.sans}`; ctx.textAlign = 'left';
+    const fs = W * 0.0125, lh = fs * 1.25, padX = fs * 0.55, padY = fs * 0.14, gap = fs * 2.4, rowGap = fs * 0.18, margin = W * 0.045;
+    ctx.font = `500 ${fs}px ${F.sans}`; ctx.letterSpacing = `${fs * 0.02}px`; ctx.textBaseline = 'middle';
+    ctx.fillStyle = T.ink; ctx.strokeStyle = T.ink; ctx.lineWidth = Math.max(1, fs * 0.09);
+    const textW = (s: string) => ctx.measureText(s).width;
+    const line = (x0: number, y0: number, x1: number, y1: number) => { ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke(); };
     const d = data.date ? new Date(data.date > 1e11 ? data.date : data.date * 1000) : null;
-    const dstr = d ? d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
-    ctx.fillText(data.event || 'Counter-Strike 2', mx, H * 0.06);
-    ctx.textAlign = 'right'; ctx.fillText(dstr, W - mx, H * 0.06);
-    ctx.textAlign = 'left'; ctx.globalAlpha = 0.65;
-    const sub = data.series
-      ? data.mapInfo.map((m) => `${m.map || 'Map'} ${m.score[0]}–${m.score[1]}`).join('   ·   ')
-      : `${data.mapInfo[0].map || ''}${nR > 24 ? `   ·   prolongation (${nR} rounds)` : `   ·   ${nR} rounds`}`;
-    ctx.fillText(sub, mx, H * 0.06 + small * 1.6);
-    ctx.globalAlpha = 1;
-
-    const yBase = H - H * 0.052;
+    const dateRows = d ? [`${d.getDate()} ${d.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '').toUpperCase()}`, `${d.getFullYear()}`] : [];
+    const matchNo = data.matchId ? `#${data.matchId}` : '';
+    const right = W - margin, bottom = H - margin, cellH = lh + padY * 2, boxH = cellH * 2;
+    const noW = matchNo ? textW(matchNo) + padX * 2 : 0, dateW = d ? Math.max(...dateRows.map(textW)) + padX * 2 : 0;
+    const boxX = right - noW - dateW, boxY = bottom - boxH, cy = boxY + boxH / 2;
     ctx.textAlign = 'center';
-    ctx.font = `${W * 0.105}px ${F.serif}`;
-    ctx.fillText(`${data.teams[0].score} – ${data.teams[1].score}`, W / 2, yBase);
-    ctx.font = `600 ${W * 0.022}px ${F.sans}`;
-    ctx.textAlign = 'left'; ctx.fillStyle = tc[0]; ctx.fillText(data.teams[0].name, mx, yBase - W * 0.008);
-    ctx.textAlign = 'right'; ctx.fillStyle = tc[1]; ctx.fillText(data.teams[1].name, W - mx, yBase - W * 0.008);
-    ctx.fillStyle = T.ink; ctx.globalAlpha = 0.55; ctx.font = `${small * 0.8}px ${F.mono}`; ctx.textAlign = 'left';
-    const ref = data.matchId ? `match ${data.matchId}` : `map ${data.mapInfo.map((m) => m.mapStatsId ?? '—').join('/')}`;
-    ctx.fillText(`${SOURCE_LABEL[data.source] || data.source} ${ref}  ·  seed ${P.seed}  ·  drame ${drama.toFixed(2)}`, mx, H - H * 0.018);
-    ctx.globalAlpha = 1;
+    if (noW + dateW) ctx.strokeRect(boxX, boxY, noW + dateW, boxH);
+    if (matchNo) ctx.fillText(matchNo, boxX + noW / 2, cy);
+    if (matchNo && d) line(boxX + noW, boxY, boxX + noW, bottom);
+    if (d) line(boxX + noW, cy, right, cy);
+    dateRows.forEach((row, i) => ctx.fillText(row, boxX + noW + dateW / 2, boxY + cellH * (i + 0.5)));
+
+    const scores = data.teams.map((t) => String(t.score)), scoreW = Math.max(...scores.map(textW));
+    const scoreX = (noW + dateW ? boxX - gap : right) - scoreW / 2, nameX = scoreX - scoreW / 2 - gap;
+    data.teams.forEach((t, i) => {
+      const y = cy + (i - 0.5) * (lh + rowGap);
+      ctx.textAlign = 'right'; ctx.fillText(t.name.toUpperCase(), nameX, y);
+      ctx.textAlign = 'center'; ctx.fillText(scores[i], scoreX, y);
+    });
+    ctx.letterSpacing = '0px';
   }
+
+  // Score de chaque map, une fois, en tout petit sur son dernier round, à la couleur de l'équipe qui l'a gagnée.
+  // Dessiné en dernier, par-dessus la typographie. La position passe par warp() pour suivre la peinture. Sur papier,
+  // la couleur est assombrie : posé sur sa propre encre, le score à la couleur pure disparaît.
+  const SCORE_SHADE = 0.7;
+  ctx.font = `700 ${W * P.mapScoreSize}px ${F.sans}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  if (P.showMapScores) data.mapInfo.forEach((m) => {
+    if (m.score[0] === m.score[1]) return;
+    const [sx, sy] = slotPos(slotOf(m.start + m.len - 1, 0.5)), [x, y] = warp(sx, sy);
+    const winner = m.score[0] > m.score[1] ? 0 : 1;
+    ctx.fillStyle = P.theme === 'ink' ? tc[winner] : `rgb(${inkRGB[winner].map((v) => Math.round(v * SCORE_SHADE)).join(',')})`;
+    ctx.fillText(`${m.score[0]}–${m.score[1]}`, x, y);
+  });
 
   return { drama, keys, rows, events: events.length };
 }
