@@ -54,6 +54,42 @@ officielle, elle peut changer sans prévenir (tout le code qui la lit est dans `
   remplacer par une base de données)
 - `fixtures/` : matchs fictifs, régénérés par `pnpm fixtures`
 
+## Déployer (VPS + pm2)
+
+Chaque push sur `main` lance `.github/workflows/deploy.yml` : connexion SSH au VPS, `git reset --hard
+origin/main`, `pnpm install`, Chromium de Playwright, `pnpm build`, puis
+`pm2 startOrReload ecosystem.config.cjs`. `data/` est ignoré par git : le reset ne touche ni le cache
+des matchs ni les posters.
+
+Une seule fois sur le VPS :
+
+    # Node ≥ 23 (type stripping natif), pnpm, pm2
+    npm i -g pnpm pm2
+    git clone git@github.com:RSelwa/cs-poster.git ~/cs-posters && cd ~/cs-posters
+    pnpm install && sudo pnpm exec playwright install-deps chromium && pnpm exec playwright install chromium
+    pnpm build
+    pm2 start ecosystem.config.cjs && pm2 save
+    pm2 startup   # puis lancer la commande qu'il affiche
+
+Le serveur écoute sur `:4173`, nginx le sert sur `cs-poster.raphael-selwa.com` (DNS : un enregistrement
+A vers l'IP du VPS) :
+
+    sudo cp deploy/cs-poster.raphael-selwa.com.conf /etc/nginx/sites-available/
+    sudo ln -s /etc/nginx/sites-available/cs-poster.raphael-selwa.com.conf /etc/nginx/sites-enabled/
+    sudo nginx -t && sudo systemctl reload nginx
+    sudo certbot --nginx -d cs-poster.raphael-selwa.com   # HTTPS + redirection, renouvelé automatiquement
+Les variables d'environnement (`TIERS`, `POSTER_SIZE`…) vont dans `env` de `ecosystem.config.cjs`.
+
+Dans le repo GitHub, environnement par défaut :
+
+| nom | type | valeur |
+| --- | --- | --- |
+| `VPS_HOST` | variable | IP ou hôte du VPS |
+| `VPS_USER` | variable | utilisateur SSH |
+| `APP_DIR` | variable | chemin du clone, ex. `/home/deploy/cs-posters` |
+| `NODE_BIN_DIR` | variable | dossier contenant `node`, `pnpm` et `pm2` (`dirname $(which pm2)`) |
+| `SSH_PRIVATE_KEY` | secret | clé privée dont la publique est dans `~/.ssh/authorized_keys` du VPS |
+
 ## Vérifier
 
     pnpm typecheck

@@ -1,0 +1,36 @@
+name: 🚀 Deploy
+run-name: 🚀 Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: vps-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: 🚀 Deploy to VPS
+    steps:
+      - name: 🚀 Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ vars.VPS_HOST }}
+          username: ${{ vars.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          command_timeout: 30m
+          script: |
+            set -e
+            export PATH="${{ vars.NODE_BIN_DIR }}:$PATH"
+            cd ${{ vars.APP_DIR }}
+            git fetch origin main
+            git reset --hard origin/main
+            pnpm install --frozen-lockfile
+            pnpm exec playwright install chromium
+            pnpm build
+            pm2 startOrReload ecosystem.config.cjs --update-env
+            pm2 save
