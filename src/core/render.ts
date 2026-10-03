@@ -4,7 +4,7 @@ import { makeNoise, mulberry32 } from './noise.ts';
 import type { MapData, Match, Pair } from './types.ts';
 
 export type Theme = 'paper' | 'ink';
-export type BgText = 'data' | 'players';
+export type BgText = 'small' | 'large';
 export type Fonts = { serif: string; sans: string; mono: string };
 
 export type PosterParams = {
@@ -25,7 +25,7 @@ export const DEFAULTS: PosterParams = {
   noise: 0.3, noiseScale: 2.2,
   gravity: 1.0, swirl: 1.0, dramaAuto: true, drama: 0.5, streakMin: 4,
   blend: 1.0, dominance: 2.0, mapScoreSize: 0.005,
-  showGrid: false, showBgData: true, bgText: 'data', showText: true, showLines: false, showMapScores: true,
+  showGrid: false, showBgData: true, bgText: 'small', showText: true, showLines: false, showMapScores: true,
 };
 
 // palette par défaut, stable pour un nom d'équipe (mêmes couleurs dans l'éditeur et dans le rendu headless)
@@ -84,8 +84,8 @@ const estimateKills = (match: Match, rnd: () => number) => match.maps.flatMap((m
 
 // Pseudos des deux équipes, sans doublon d'une map à l'autre ; noms d'équipe si le match n'a pas de joueurs.
 const playerNames = (data: Match) => {
-  const names = [0, 1].flatMap((t) => [...new Set(data.maps.flatMap((m) => (m.players?.[t] || []).map((p) => p.name.trim().toUpperCase())))]).filter(Boolean);
-  return `${(names.length ? names : data.teams.map((t) => t.name.toUpperCase())).join('  ·  ')}  ·  `;
+  const names = [0, 1].flatMap((t) => [...new Set(data.maps.flatMap((m) => (m.players?.[t] || []).map((p) => p.name.trim())))]).filter(Boolean);
+  return names.length ? names : data.teams.map((t) => t.name);
 };
 
 type Well = { x: number; y: number; m: number; kind: string; i: number };
@@ -111,16 +111,15 @@ export function renderPoster(ctx: CanvasRenderingContext2D, W: number, H: number
   const slotOf = (ri: number, tm: number) => Math.min(totalSlots - 1, Math.floor(((ri + tm) / Math.max(1, nR)) * totalSlots));
   const slotPos = (slot: number, jx = 0.5, jy = 0.5) => [((slot % P.cols) + jx) * cw, (Math.floor(slot / P.cols) + jy) * ch];
 
-  // fond de texte : les données du match en JSON, ou les pseudos des joueurs répétés
+  // fond de texte : les pseudos des joueurs des deux équipes, répétés. En gras, petit ou grand (capitales).
   if (P.showBgData) {
-    const players = P.bgText === 'players';
-    const compact = players ? playerNames(data) : JSON.stringify({ e: data.event, t: data.teams.map((x) => x.name), m: data.maps.map((m) => ({ map: m.map, id: m.mapStatsId, s: m.teams.map((x) => x.score), r: m.rounds.map((r) => `${r.n}${r.winner}${r.type}`), p: m.players })) });
-    const fs = W * (players ? 0.021 : 0.0072), lh = fs * (players ? 1.12 : 1.38);
-    ctx.font = players ? `600 ${fs}px ${F.sans}` : `${fs}px ${F.mono}`; ctx.fillStyle = T.ink; ctx.globalAlpha = T.dataAlpha; ctx.textBaseline = 'top';
-    const cw1 = (players ? ctx.measureText(compact).width / compact.length : ctx.measureText('0123456789').width / 10) || fs * 0.6;
+    const large = P.bgText === 'large', names = playerNames(data);
+    const compact = large ? `${names.map((n) => n.toUpperCase()).join('  ·  ')}  ·  ` : `${names.join(' ')} `;
+    const fs = W * (large ? 0.021 : 0.0072), lh = fs * (large ? 1.12 : 1.38);
+    ctx.font = `700 ${fs}px ${F.sans}`; ctx.fillStyle = T.ink; ctx.globalAlpha = T.dataAlpha; ctx.textBaseline = 'top';
+    const cw1 = ctx.measureText(compact).width / compact.length || fs * 0.6;
     const cpl = Math.ceil(W / cw1) + 4;
-    const sep = players ? '' : ' ';
-    let str = compact; while (str.length < cpl * 2) str += sep + compact;
+    let str = compact; while (str.length < cpl * 2) str += compact;
     for (let y = 0, li = 0; y < H; y += lh, li++) { const o = (li * 37) % compact.length; ctx.fillText((str + str).slice(o, o + cpl), 0, y); }
     ctx.globalAlpha = 1;
   }

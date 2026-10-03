@@ -124,7 +124,7 @@ Chrome or `npx playwright install chromium`.
   `rp` drives the grain only. Don't cross them, or tweaking the grain will move strokes.
 - Themes: `paper` (multiply) / `ink` (screen, team colors lifted).
 - Team colors: `defaultColors(match.teams)` takes each team's `color` when present, else the `PAIRS` palette (hashed on names). Two colors closer than `CLASH_DISTANCE` (RGB): team 1 gets the palette color farthest from team 0's.
-- Background text (`showBgData`): `bgText: 'data'` (match JSON, mono, default) or `'players'` (nicknames of both teams, uppercase sans, repeated).
+- Background text (`showBgData`): nicknames of both teams, repeated, bold sans (700). `bgText: 'small'` (space-separated, default) or `'large'` (bigger, uppercase, `·`-separated).
 - Parameters: `PosterParams` + `DEFAULTS` in `src/core/render.ts`. Editor sliders are declared in
   `SLIDERS` / `TOGGLES` in `src/components/controls-panel.tsx` — a new param needs both.
 - The TS port of the old `core.js` was checked pixel-identical on all fixtures, both themes. Any

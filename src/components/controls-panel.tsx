@@ -26,7 +26,7 @@ const SLIDERS: [string, SliderDef[]][] = [
   ['Scores des maps', [['mapScoreSize', 'Taille des scores', 0.002, 0.02, 0.001]]],
 ];
 const TOGGLES: [BooleanKey, string][] = [['showGrid', 'Grille chrono'], ['showBgData', 'Texte en fond'], ['showText', 'Texte'], ['showLines', 'Traits sans peinture (debug)'], ['showMapScores', 'Scores des maps']];
-const BG_TEXTS: [BgText, string][] = [['data', 'Données'], ['players', 'Joueurs']];
+const BG_TEXTS: [BgText, string][] = [['small', 'Petit'], ['large', 'Grand']];
 const EXPORT_SIZES = [['1800', '1800 × 2400 px (écran)'], ['3000', '3000 × 4000 px'], ['3540', '3540 × 4720 px (30 × 40 cm, 300 dpi)']];
 const MAX_SEED = 9999;
 
