@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeftRight, Dices } from 'lucide-react';
+import { ArrowLeftRight, Check, Copy, Dices } from 'lucide-react';
 import { ColorField } from '@/components/color-field.tsx';
 import { ParamSlider } from '@/components/param-slider.tsx';
 import { Button } from '@/components/ui/button';
@@ -33,6 +33,13 @@ const MAX_SEED = 9999;
 const INSTAGRAM = { W: 1080, H: 1350, background: '#E2E2E0', posterShare: 0.85 };
 
 type ExportKind = 'png' | 'instagram';
+const COPIED_MS = 1500;
+
+// Légende du post : « Équipe A 2 x 1 Équipe B », puis la date en anglais (« July 04, 2026 »).
+const instagramCaption = (match: Match) => {
+  const [a, b] = match.teams, d = match.date ? new Date(match.date > 1e11 ? match.date : match.date * 1000) : null;
+  return [`${a.name} ${a.score} x ${b.score} ${b.name}`, d?.toLocaleDateString('en-US', { month: 'long', day: '2-digit', year: 'numeric' })].filter(Boolean).join('\n');
+};
 
 type Props = { match: Match; params: PosterParams; onChange: (patch: Partial<PosterParams>) => void };
 
@@ -41,6 +48,8 @@ const SectionTitle = ({ children }: { children: string }) => <h2 className="mt-6
 export const ControlsPanel = ({ match, params, onChange }: Props) => {
   const [size, setSize] = useState('3540');
   const [exporting, setExporting] = useState<ExportKind | null>(null);
+  const [copied, setCopied] = useState(false);
+  const caption = instagramCaption(match);
   const drama = params.dramaAuto ? computeDrama(match) : params.drama;
 
   const renderAt = (W: number) => {
@@ -57,6 +66,12 @@ export const ControlsPanel = ({ match, params, onChange }: Props) => {
     ctx.fillStyle = INSTAGRAM.background; ctx.fillRect(0, 0, c.width, c.height);
     ctx.drawImage(poster, Math.round((c.width - poster.width) / 2), Math.round((c.height - poster.height) / 2));
     return c;
+  };
+
+  const copyCaption = async () => {
+    await navigator.clipboard.writeText(caption);
+    setCopied(true);
+    setTimeout(() => setCopied(false), COPIED_MS);
   };
 
   const exportAs = async (kind: ExportKind, render: () => HTMLCanvasElement, suffix: string) => {
@@ -122,6 +137,9 @@ export const ControlsPanel = ({ match, params, onChange }: Props) => {
       </div>
 
       <Separator className="my-5" />
+      <h2 className="mb-2 text-[13px] font-semibold">Description Instagram</h2>
+      <p className="mb-2 rounded-md bg-muted px-3 py-2 text-[13px] whitespace-pre-line">{caption}</p>
+      <Button variant="outline" className="mb-5 w-full" onClick={copyCaption}>{copied ? <><Check /> Copiée</> : <><Copy /> Copier la description</>}</Button>
       <div className="grid gap-2">
         <Select value={size} onValueChange={setSize}>
           <SelectTrigger className="w-full bg-muted" aria-label="Taille de l’export"><SelectValue /></SelectTrigger>
