@@ -1,52 +1,302 @@
 [
-  { "id": 654, "name": "Spirit", "primary": "#222222", "secondary": "#8c8c8c" },
-  { "id": 2713, "name": "Falcons", "primary": "#0ea56f", "secondary": "#222222" },
-  { "id": 765, "name": "MOUZ", "primary": "#d7192d", "secondary": "#222222" },
-  { "id": 324, "name": "9z", "primary": "#222222", "secondary": "#8c8c8c" },
-  { "id": 667, "name": "Vitality", "primary": "#e6c700", "secondary": "#222222" },
-  { "id": 787, "name": "Natus Vincere", "primary": "#f2d900", "secondary": "#222222" },
-  { "id": 8118, "name": "Legacy", "primary": "#f0a500", "secondary": "#222222" },
-  { "id": 648, "name": "FURIA", "primary": "#222222", "secondary": "#8c8c8c" },
-  { "id": 7498, "name": "BetBoom", "primary": "#f2434f", "secondary": "#222222" },
-  { "id": 3598, "name": "Aurora", "primary": "#10b3a6", "secondary": "#222222" },
-  { "id": 793, "name": "G2", "primary": "#222222", "secondary": "#d62828" },
-  { "id": 8171, "name": "PARIVISION", "primary": "#1cc3a8", "secondary": "#222222" },
-  { "id": 791, "name": "FaZe", "primary": "#e43d30", "secondary": "#222222" },
-  { "id": 20832, "name": "FUT", "primary": "#d6202f", "secondary": "#222222" },
-  { "id": 736, "name": "The MongolZ", "primary": "#e0a526", "secondary": "#222222" },
-  { "id": 755, "name": "MIBR", "primary": "#222222", "secondary": "#8c8c8c" },
-  { "id": 8221, "name": "Alliance", "primary": "#3bb52a", "secondary": "#222222" },
-  { "id": 757, "name": "TYLOO", "primary": "#d91f2a", "secondary": "#222222" },
-  { "id": 794, "name": "Astralis", "primary": "#e6283c", "secondary": "#14193a" },
-  { "id": 1539, "name": "B8", "primary": "#222222", "secondary": "#8c8c8c" },
-  { "id": 756, "name": "BIG", "primary": "#222222", "secondary": "#8c8c8c" },
-  { "id": 594, "name": "GamerLegion", "primary": "#222222", "secondary": "#8c8c8c" },
-  { "id": 22218, "name": "magic", "primary": "#7a3fb8", "secondary": "#f0d43a" },
-  { "id": 776, "name": "Luminosity", "primary": "#2aa6d9", "secondary": "#0c2340" },
-  { "id": 19186, "name": "Inner Circle", "primary": "#f2405a", "secondary": "#222222" },
-  { "id": 637, "name": "paiN", "primary": "#e5172f", "secondary": "#222222" },
-  { "id": 785, "name": "Ninjas in Pyjamas", "primary": "#b5cf00", "secondary": "#222222" },
-  { "id": 24956, "name": "DENDELE", "primary": "#1f3f8f", "secondary": "#f2b705" },
-  { "id": 476, "name": "Lynn Vision", "primary": "#b06a2c", "secondary": "#222222" },
-  { "id": 759, "name": "HEROIC", "primary": "#222222", "secondary": "#d42a2a" },
-  { "id": 696, "name": "3DMAX", "primary": "#e3232c", "secondary": "#222222" },
-  { "id": 790, "name": "Liquid", "primary": "#0f2340", "secondary": "#3a8dde" },
-  { "id": 3254, "name": "EYEBALLERS", "primary": "#e01e26", "secondary": "#222222" },
-  { "id": 21388, "name": "Nemesis", "primary": "#222222", "secondary": "#8c8c8c" },
-  { "id": 2720, "name": "HOTU", "primary": "#222222", "secondary": "#8c8c8c" },
-  { "id": 7430, "name": "M80", "primary": "#b8dc00", "secondary": "#222222" },
-  { "id": 720, "name": "Virtus.pro", "primary": "#ee6a1e", "secondary": "#222222" },
-  { "id": 6062, "name": "Wildcard", "primary": "#2f9be0", "secondary": "#e5484d" },
-  { "id": 10718, "name": "K27", "primary": "#d7262d", "secondary": "#222222" },
-  { "id": 464, "name": "100 Thieves", "primary": "#e8332a", "secondary": "#222222" },
-  { "id": 10398, "name": "FlyQuest", "primary": "#0e8a4c", "secondary": "#222222" },
-  { "id": 24570, "name": "Echo", "primary": "#222222", "secondary": "#8c8c8c" },
-  { "id": 22184, "name": "FOKUS", "primary": "#e02424", "secondary": "#222222" },
-  { "id": 5214, "name": "Bulgaria", "primary": "#00966e", "secondary": "#d62612" },
-  { "id": 21396, "name": "Gentle Mates", "primary": "#222222", "secondary": "#8c8c8c" },
-  { "id": 1024, "name": "INFINITE", "primary": "#e3201b", "secondary": "#222222" },
-  { "id": 18539, "name": "Nuclear TigeRES", "primary": "#e8622a", "secondary": "#222222" },
-  { "id": 751, "name": "NRG", "primary": "#f04a12", "secondary": "#222222" },
-  { "id": 22414, "name": "TDK", "primary": "#c8323a", "secondary": "#222222" },
-  { "id": 16748, "name": "WW", "primary": "#e3141e", "secondary": "#222222" }
+  {
+    "id": 654,
+    "name": "Spirit",
+    "primary": "#222222",
+    "secondary": "#8c8c8c"
+  },
+  {
+    "id": 2713,
+    "name": "Falcons",
+    "primary": "#5EBB74",
+    "secondary": "#222222"
+  },
+  {
+    "id": 765,
+    "name": "MOUZ",
+    "primary": "#E43316",
+    "secondary": "#222222"
+  },
+  {
+    "id": 324,
+    "name": "9z",
+    "primary": "#222222",
+    "secondary": "#8c8c8c"
+  },
+  {
+    "id": 667,
+    "name": "Vitality",
+    "primary": "#FEFF45",
+    "secondary": "#222222"
+  },
+  {
+    "id": 787,
+    "name": "Natus Vincere",
+    "primary": "#FBF25C",
+    "secondary": "#222222"
+  },
+  {
+    "id": 8118,
+    "name": "Legacy",
+    "primary": "#F3CB37",
+    "secondary": "#222222"
+  },
+  {
+    "id": 648,
+    "name": "FURIA",
+    "primary": "#222222",
+    "secondary": "#8c8c8c"
+  },
+  {
+    "id": 7498,
+    "name": "BetBoom",
+    "primary": "#f2434f",
+    "secondary": "#222222"
+  },
+  {
+    "id": 3598,
+    "name": "Aurora",
+    "primary": "#F3CB37",
+    "secondary": "#222222"
+  },
+  {
+    "id": 793,
+    "name": "G2",
+    "primary": "#222222",
+    "secondary": "#d62828"
+  },
+  {
+    "id": 8171,
+    "name": "PARIVISION",
+    "primary": "#1cc3a8",
+    "secondary": "#222222"
+  },
+  {
+    "id": 791,
+    "name": "FaZe",
+    "primary": "#e43d30",
+    "secondary": "#222222"
+  },
+  {
+    "id": 20832,
+    "name": "FUT",
+    "primary": "#d6202f",
+    "secondary": "#222222"
+  },
+  {
+    "id": 736,
+    "name": "The MongolZ",
+    "primary": "#DEB757",
+    "secondary": "#222222"
+  },
+  {
+    "id": 755,
+    "name": "MIBR",
+    "primary": "#222222",
+    "secondary": "#8c8c8c"
+  },
+  {
+    "id": 8221,
+    "name": "Alliance",
+    "primary": "#3bb52a",
+    "secondary": "#222222"
+  },
+  {
+    "id": 757,
+    "name": "TYLOO",
+    "primary": "#d91f2a",
+    "secondary": "#222222"
+  },
+  {
+    "id": 794,
+    "name": "Astralis",
+    "primary": "#D25542",
+    "secondary": "#14193a"
+  },
+  {
+    "id": 1539,
+    "name": "B8",
+    "primary": "#222222",
+    "secondary": "#8c8c8c"
+  },
+  {
+    "id": 756,
+    "name": "BIG",
+    "primary": "#222222",
+    "secondary": "#8c8c8c"
+  },
+  {
+    "id": 594,
+    "name": "GamerLegion",
+    "primary": "#222222",
+    "secondary": "#8c8c8c"
+  },
+  {
+    "id": 22218,
+    "name": "magic",
+    "primary": "#7a3fb8",
+    "secondary": "#f0d43a"
+  },
+  {
+    "id": 776,
+    "name": "Luminosity",
+    "primary": "#2aa6d9",
+    "secondary": "#0c2340"
+  },
+  {
+    "id": 19186,
+    "name": "Inner Circle",
+    "primary": "#f2405a",
+    "secondary": "#222222"
+  },
+  {
+    "id": 637,
+    "name": "paiN",
+    "primary": "#e5172f",
+    "secondary": "#222222"
+  },
+  {
+    "id": 785,
+    "name": "Ninjas in Pyjamas",
+    "primary": "#b5cf00",
+    "secondary": "#222222"
+  },
+  {
+    "id": 24956,
+    "name": "DENDELE",
+    "primary": "#1f3f8f",
+    "secondary": "#f2b705"
+  },
+  {
+    "id": 476,
+    "name": "Lynn Vision",
+    "primary": "#b06a2c",
+    "secondary": "#222222"
+  },
+  {
+    "id": 759,
+    "name": "HEROIC",
+    "primary": "#222222",
+    "secondary": "#d42a2a"
+  },
+  {
+    "id": 696,
+    "name": "3DMAX",
+    "primary": "#e3232c",
+    "secondary": "#222222"
+  },
+  {
+    "id": 790,
+    "name": "Liquid",
+    "primary": "#0f2340",
+    "secondary": "#3a8dde"
+  },
+  {
+    "id": 3254,
+    "name": "EYEBALLERS",
+    "primary": "#e01e26",
+    "secondary": "#222222"
+  },
+  {
+    "id": 21388,
+    "name": "Nemesis",
+    "primary": "#222222",
+    "secondary": "#8c8c8c"
+  },
+  {
+    "id": 2720,
+    "name": "HOTU",
+    "primary": "#222222",
+    "secondary": "#8c8c8c"
+  },
+  {
+    "id": 7430,
+    "name": "M80",
+    "primary": "#b8dc00",
+    "secondary": "#222222"
+  },
+  {
+    "id": 720,
+    "name": "Virtus.pro",
+    "primary": "#ee6a1e",
+    "secondary": "#222222"
+  },
+  {
+    "id": 6062,
+    "name": "Wildcard",
+    "primary": "#2f9be0",
+    "secondary": "#e5484d"
+  },
+  {
+    "id": 10718,
+    "name": "K27",
+    "primary": "#d7262d",
+    "secondary": "#222222"
+  },
+  {
+    "id": 464,
+    "name": "100 Thieves",
+    "primary": "#e8332a",
+    "secondary": "#222222"
+  },
+  {
+    "id": 10398,
+    "name": "FlyQuest",
+    "primary": "#0e8a4c",
+    "secondary": "#222222"
+  },
+  {
+    "id": 24570,
+    "name": "Echo",
+    "primary": "#222222",
+    "secondary": "#8c8c8c"
+  },
+  {
+    "id": 22184,
+    "name": "FOKUS",
+    "primary": "#e02424",
+    "secondary": "#222222"
+  },
+  {
+    "id": 5214,
+    "name": "Bulgaria",
+    "primary": "#00966e",
+    "secondary": "#d62612"
+  },
+  {
+    "id": 21396,
+    "name": "Gentle Mates",
+    "primary": "#222222",
+    "secondary": "#8c8c8c"
+  },
+  {
+    "id": 1024,
+    "name": "INFINITE",
+    "primary": "#e3201b",
+    "secondary": "#222222"
+  },
+  {
+    "id": 18539,
+    "name": "Nuclear TigeRES",
+    "primary": "#e8622a",
+    "secondary": "#222222"
+  },
+  {
+    "id": 751,
+    "name": "NRG",
+    "primary": "#f04a12",
+    "secondary": "#222222"
+  },
+  {
+    "id": 22414,
+    "name": "TDK",
+    "primary": "#c8323a",
+    "secondary": "#222222"
+  },
+  {
+    "id": 16748,
+    "name": "WW",
+    "primary": "#e3141e",
+    "secondary": "#222222"
+  }
 ]
