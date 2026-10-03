@@ -29,6 +29,10 @@ const TOGGLES: [BooleanKey, string][] = [['showGrid', 'Grille chrono'], ['showBg
 const BG_TEXTS: [BgText, string][] = [['small', 'Petit'], ['large', 'Grand']];
 const EXPORT_SIZES = [['1800', '1800 × 2400 px (écran)'], ['3000', '3000 × 4000 px'], ['3540', '3540 × 4720 px (30 × 40 cm, 300 dpi)']];
 const MAX_SEED = 9999;
+// Post Instagram 4:5 : l'affiche (3:4) occupe 85 % de la hauteur, centrée sur un fond uni.
+const INSTAGRAM = { W: 1080, H: 1350, background: '#E2E2E0', posterShare: 0.85 };
+
+type ExportKind = 'png' | 'instagram';
 
 type Props = { match: Match; params: PosterParams; onChange: (patch: Partial<PosterParams>) => void };
 
@@ -36,18 +40,32 @@ const SectionTitle = ({ children }: { children: string }) => <h2 className="mt-6
 
 export const ControlsPanel = ({ match, params, onChange }: Props) => {
   const [size, setSize] = useState('3540');
-  const [exporting, setExporting] = useState(false);
+  const [exporting, setExporting] = useState<ExportKind | null>(null);
   const drama = params.dramaAuto ? computeDrama(match) : params.drama;
 
-  const exportPng = async () => {
-    setExporting(true);
-    await new Promise((r) => setTimeout(r, 60));
-    const W = Number(size), c = document.createElement('canvas');
+  const renderAt = (W: number) => {
+    const c = document.createElement('canvas');
     c.width = W; c.height = Math.round((W * 4) / 3);
     renderPoster(c.getContext('2d')!, c.width, c.height, match, params, FONTS);
+    return c;
+  };
+
+  const renderInstagram = () => {
+    const poster = renderAt(Math.round((INSTAGRAM.H * INSTAGRAM.posterShare * 3) / 4)), c = document.createElement('canvas');
+    c.width = INSTAGRAM.W; c.height = INSTAGRAM.H;
+    const ctx = c.getContext('2d')!;
+    ctx.fillStyle = INSTAGRAM.background; ctx.fillRect(0, 0, c.width, c.height);
+    ctx.drawImage(poster, Math.round((c.width - poster.width) / 2), Math.round((c.height - poster.height) / 2));
+    return c;
+  };
+
+  const exportAs = async (kind: ExportKind, render: () => HTMLCanvasElement, suffix: string) => {
+    setExporting(kind);
+    await new Promise((r) => setTimeout(r, 60));
+    const c = render();
     const blob = await new Promise<Blob | null>((r) => c.toBlob(r, 'image/png'));
-    if (blob) download(blob, `${match.teams[0].name}-${match.teams[0].score}-${match.teams[1].score}-${match.teams[1].name}-${W}px.png`);
-    setExporting(false);
+    if (blob) download(blob, `${match.teams[0].name}-${match.teams[0].score}-${match.teams[1].score}-${match.teams[1].name}-${suffix}.png`);
+    setExporting(null);
   };
 
   return (
@@ -109,7 +127,10 @@ export const ControlsPanel = ({ match, params, onChange }: Props) => {
           <SelectTrigger className="w-full bg-muted" aria-label="Taille de l’export"><SelectValue /></SelectTrigger>
           <SelectContent>{EXPORT_SIZES.map(([v, label]) => <SelectItem key={v} value={v}>{label}</SelectItem>)}</SelectContent>
         </Select>
-        <Button onClick={exportPng} disabled={exporting}>{exporting ? 'Rendu en cours…' : 'Exporter en PNG'}</Button>
+        <div className="flex flex-wrap gap-2 [&>button]:flex-1">
+          <Button onClick={() => exportAs('png', () => renderAt(Number(size)), `${size}px`)} disabled={exporting !== null}>{exporting === 'png' ? 'Rendu en cours…' : 'Exporter en PNG'}</Button>
+          <Button variant="outline" onClick={() => exportAs('instagram', renderInstagram, 'instagram')} disabled={exporting !== null}>{exporting === 'instagram' ? 'Rendu en cours…' : 'Exporter pour Instagram'}</Button>
+        </div>
       </div>
     </div>
   );
