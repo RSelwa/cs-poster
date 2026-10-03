@@ -109,7 +109,7 @@ Chrome or `npx playwright install chromium`.
      (orange × blue → green, red × blue → plum; that third color is wanted). The raw product is
      too dark, so its lightness is lifted toward a plain paint mix (`OVERLAP_LIFT`) and its
      saturation boosted where both inks cover (`OVERLAP_SAT`). `P.blend` (slider "Mélange des
-     encres", 0–1.5, default 1) interpolates from a plain paint mix (0, no third color) to this
+     encres", 0–1.5, default 0.15) interpolates from a plain paint mix (0, no third color) to this
      result (1) and extrapolates past it. Ink theme: plain screen, `blend` has no effect.
   6. **Flecks**: after the composite, short dark dashes on ~70 kill events and ~320 dust
      specks, from the `rp` stream.

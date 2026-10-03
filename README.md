@@ -74,8 +74,8 @@ Une seule fois sur le VPS :
 Le serveur écoute sur `:4173`, nginx le sert sur `cs-poster.raphael-selwa.com` (DNS : un enregistrement
 A vers l'IP du VPS) :
 
-    sudo cp deploy/cs-poster.raphael-selwa.com.conf /etc/nginx/sites-available/
-    sudo ln -s /etc/nginx/sites-available/cs-poster.raphael-selwa.com.conf /etc/nginx/sites-enabled/
+    sudo cp deploy/cs-poster.raphael-selwa.com.conf /etc/nginx/sites-available/cs-poster
+    sudo ln -s /etc/nginx/sites-available/cs-poster /etc/nginx/sites-enabled/
     sudo nginx -t && sudo systemctl reload nginx
     sudo certbot --nginx -d cs-poster.raphael-selwa.com   # HTTPS + redirection, renouvelé automatiquement
 Les variables d'environnement (`TIERS`, `POSTER_SIZE`…) vont dans `env` de `ecosystem.config.cjs`.

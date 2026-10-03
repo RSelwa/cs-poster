@@ -24,7 +24,7 @@ export const DEFAULTS: PosterParams = {
   strokes: 2.5, brush: 0.02, grain: 1.0,
   noise: 0.3, noiseScale: 2.2,
   gravity: 1.0, swirl: 1.0, dramaAuto: true, drama: 0.5, streakMin: 4,
-  blend: 1.0, dominance: 2.0, mapScoreSize: 0.005,
+  blend: 0.15, dominance: 2.0, mapScoreSize: 0.005,
   showGrid: false, showBgData: true, bgText: 'small', showText: true, showLines: false, showMapScores: true,
 };
 
